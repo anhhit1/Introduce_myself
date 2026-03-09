@@ -1,0 +1,578 @@
+<!doctype html>
+<html class="scroll-smooth dark" lang="vi">
+  <head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Hành Trình • Bùi Việt Quốc</title>
+    <meta
+      name="description"
+      content="Hành trình sự nghiệp và phát triển của Bùi Việt Quốc trong lĩnh vực AI"
+    />
+    <link href="https://fonts.googleapis.com" rel="preconnect" />
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script>
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              primary: "#5f62f7",
+              secondary: "#06b6d4",
+              dark: "#0a0a0c",
+            },
+            fontFamily: { sans: ["Inter", "sans-serif"] },
+            borderRadius: { custom: "8px" },
+          },
+        },
+      };
+    </script>
+    <link rel="stylesheet" href="assets/css/custom.css" />
+  </head>
+  <body class="bg-slate-50 dark:bg-dark text-slate-800 dark:text-slate-200 font-sans selection:bg-primary/30">
+    <canvas id="neural-bg"></canvas>
+
+    <!-- Navigation -->
+    <nav class="fixed top-0 w-full z-50 px-6 py-4">
+      <div
+        class="max-w-7xl mx-auto flex items-center justify-between glass rounded-2xl px-6 py-3 border border-slate-900/10 dark:border-white/10"
+      >
+        <a href="index.html" class="flex items-center gap-2">
+          <div
+            class="w-8 h-8 bg-gradient-to-br from-primary to-secondary rounded-lg flex items-center justify-center font-bold text-white"
+          >
+            Q
+          </div>
+          <span class="font-bold tracking-tight text-slate-900 dark:text-white hidden sm:block"
+            >Bùi Việt Quốc
+            <span class="text-secondary opacity-80">• AI Engineer</span></span
+          >
+        </a>
+            <div class="hidden md:flex items-center gap-8 text-sm font-medium">
+      <a class="hover:text-primary transition-colors" href="index.html">
+        <span lang-content="vi">Trang chủ</span>
+        <span lang-content="en">Home</span>
+      </a>
+      <a class="hover:text-primary transition-colors" href="about.html">
+        <span lang-content="vi">Giới thiệu</span>
+        <span lang-content="en">About</span>
+      </a>
+      <a class="hover:text-primary transition-colors" href="skills.html">
+        <span lang-content="vi">Kỹ năng</span>
+        <span lang-content="en">Skills</span>
+      </a>
+      <a class="hover:text-primary transition-colors" href="projects.html">
+        <span lang-content="vi">Dự án</span>
+        <span lang-content="en">Projects</span>
+      </a>
+      <a class="text-primary font-bold" href="journey.html">
+        <span lang-content="vi">Hành trình</span>
+        <span lang-content="en">Journey</span>
+      </a>
+    </div>
+    <div class="flex items-center gap-4">
+      <!-- Theme Switcher -->
+      <button class="p-2 hover:bg-slate-900/5 dark:hover:bg-white/5 rounded-lg transition-colors border border-slate-900/5 dark:border-white/5 flex items-center justify-center" id="theme-toggle">
+        <i class="w-4 h-4" data-lucide="moon"></i>
+      </button>
+      
+      <!-- Language Switcher -->
+      <button class="p-2 hover:bg-slate-900/5 dark:bg-white/5 rounded-lg transition-colors border border-slate-900/5 dark:border-white/5 flex items-center gap-2 text-xs uppercase tracking-widest font-bold text-secondary" id="lang-toggle">
+        <i class="w-4 h-4" data-lucide="languages"></i>
+        <span id="lang-label">EN</span>
+      </button>
+      
+      <!-- Chat AI Button -->
+      <button class="hidden sm:flex items-center gap-2 bg-primary hover:bg-primary/80 text-white px-4 py-2 rounded-lg text-sm font-semibold transition-all shadow-[0_0_20px_rgba(95,98,247,0.4)]" onclick="toggleChat()">
+        <i class="w-4 h-4" data-lucide="sparkles"></i>
+        <span lang-content="vi">Chat với AI Assistant</span>
+        <span lang-content="en">Chat with AI Assistant</span>
+      </button>
+      
+      <!-- Mobile Menu Button -->
+      <button class="md:hidden p-2 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:text-white transition-colors" id="mobile-menu-btn">
+        <i class="w-6 h-6" data-lucide="menu"></i>
+      </button>
+    </div>
+      </div>
+      
+        <!-- Mobile Menu Dropdown -->
+    <div id="mobile-menu" class="hidden md:hidden absolute top-full left-0 right-0 mt-2 mx-6 glass rounded-2xl border border-slate-900/10 dark:border-white/10 p-4 flex-col gap-2 shadow-2xl">
+    <a class="text-slate-900 dark:text-white hover:bg-slate-900/5 dark:hover:bg-white/5 border border-transparent rounded-xl px-4 py-3 font-semibold transition-all flex items-center gap-3" href="index.html">
+      <i class="w-5 h-5 min-w-[20px] text-primary" data-lucide="home"></i>
+      <span lang-content="vi">Trang chủ</span><span lang-content="en">Home</span>
+    </a>
+    <a class="text-slate-900 dark:text-white hover:bg-slate-900/5 dark:hover:bg-white/5 border border-transparent rounded-xl px-4 py-3 font-semibold transition-all flex items-center gap-3" href="about.html">
+      <i class="w-5 h-5 min-w-[20px] text-primary" data-lucide="user"></i>
+      <span lang-content="vi">Giới thiệu</span><span lang-content="en">About</span>
+    </a>
+    <a class="text-slate-900 dark:text-white hover:bg-slate-900/5 dark:hover:bg-white/5 border border-transparent rounded-xl px-4 py-3 font-semibold transition-all flex items-center gap-3" href="skills.html">
+      <i class="w-5 h-5 min-w-[20px] text-secondary" data-lucide="zap"></i>
+      <span lang-content="vi">Kỹ năng</span><span lang-content="en">Skills</span>
+    </a>
+    <a class="text-slate-900 dark:text-white hover:bg-slate-900/5 dark:hover:bg-white/5 border border-transparent rounded-xl px-4 py-3 font-semibold transition-all flex items-center gap-3" href="projects.html">
+      <i class="w-5 h-5 min-w-[20px] text-primary" data-lucide="folder-open"></i>
+      <span lang-content="vi">Dự án</span><span lang-content="en">Projects</span>
+    </a>
+    <a class="text-primary bg-primary/10 border border-primary/30 rounded-xl px-4 py-3 font-bold transition-all flex items-center gap-3" href="journey.html">
+      <i class="w-5 h-5 min-w-[20px] text-secondary" data-lucide="map"></i>
+      <span lang-content="vi">Hành trình</span><span lang-content="en">Journey</span>
+    </a>
+    <div class="h-px bg-slate-200 dark:bg-white/10 w-full my-2"></div>
+    <button class="bg-primary/20 text-white border border-primary/20 px-4 py-3 rounded-xl flex justify-center items-center gap-2 font-bold text-sm hover:bg-primary/30 transition-colors w-full" onclick="toggleChat(); document.getElementById('mobile-menu').classList.add('hidden'); document.getElementById('mobile-menu-btn').innerHTML='<i class=\'w-6 h-6\' data-lucide=\'menu\'></i>'; if (typeof lucide !== 'undefined') { lucide.createIcons(); }">
+      <i class="w-4 h-4 text-primary" data-lucide="sparkles"></i>
+      <span lang-content="vi">Chat với AI Assistant</span><span lang-content="en">Chat with AI Assistant</span>
+    </button>
+  </div>
+</nav>
+
+    <main class="relative pt-32 px-6">
+      <!-- Page Header -->
+      <section class="max-w-4xl mx-auto mb-16 fade-in-up">
+        <div
+          class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-secondary/10 border border-secondary/20 text-secondary text-xs font-bold mb-6 uppercase tracking-widest"
+        >
+          <i class="w-3 h-3" data-lucide="map"></i>
+          <span lang-content="vi">Lộ trình</span>
+          <span lang-content="en">Roadmap</span>
+        </div>
+        <h1
+          class="text-4xl md:text-6xl font-extrabold mb-6 tracking-tight text-slate-900 dark:text-white leading-tight"
+        >
+          <span lang-content="vi"
+            >Hành Trình
+            <span
+              class="text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary neon-text"
+              >Sự Nghiệp</span
+            ></span
+          >
+          <span lang-content="en"
+            >Career
+            <span
+              class="text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary neon-text"
+              >Journey</span
+            ></span
+          >
+        </h1>
+        <p class="text-xl text-slate-600 dark:text-slate-400 max-w-3xl leading-relaxed">
+          <span lang-content="vi"
+            >Từ những dòng code đầu tiên đến con đường trở thành AI Engineer —
+            mỗi bước đi đều là bài học quý giá.</span
+          >
+          <span lang-content="en"
+            >From my first lines of code to the path of becoming an AI Engineer
+            — every step is a valuable lesson.</span
+          >
+        </p>
+      </section>
+
+      <!-- Timeline -->
+      <section class="max-w-4xl mx-auto mb-20">
+        <div class="relative">
+          <!-- Timeline Line -->
+          <div
+            class="absolute left-[23px] md:left-1/2 md:-translate-x-px top-0 bottom-0 w-0.5 bg-gradient-to-b from-primary via-secondary to-primary/20"
+          ></div>
+
+          <!-- 2022 -->
+          <div
+            class="relative flex flex-col md:flex-row items-start mb-16 fade-in-up fade-in-up-delay-1"
+          >
+            <div class="md:w-1/2 md:pr-12 md:text-right pl-16 md:pl-0">
+              <div
+                class="glass p-8 rounded-2xl border border-slate-900/5 dark:border-white/5 hover:border-primary/30 transition-all"
+              >
+                <div class="flex items-center gap-2 mb-3 md:justify-end">
+                  <i
+                    class="w-5 h-5 text-primary"
+                    data-lucide="graduation-cap"
+                  ></i>
+                  <span class="text-sm font-bold text-primary">2022</span>
+                </div>
+                <h3 class="text-xl font-bold text-slate-900 dark:text-white mb-3">
+                  <span lang-content="vi">Bắt Đầu Đại Học</span>
+                  <span lang-content="en">Started University</span>
+                </h3>
+                <p
+                  class="text-slate-600 dark:text-slate-400 text-sm leading-relaxed"
+                  lang-content="vi"
+                >
+                  Nhập học ngành Công nghệ Thông tin. Bắt đầu hành trình với các
+                  môn cơ sở: Toán rời rạc, Cấu trúc dữ liệu, Lập trình C/C++.
+                </p>
+                <p
+                  class="text-slate-600 dark:text-slate-400 text-sm leading-relaxed"
+                  lang-content="en"
+                >
+                  Enrolled in Information Technology. Started with foundational
+                  courses: Discrete Mathematics, Data Structures, C/C++
+                  Programming.
+                </p>
+                <div class="flex flex-wrap gap-2 mt-4 md:justify-end">
+                  <span
+                    class="text-[10px] bg-slate-900/5 dark:bg-white/5 text-slate-600 dark:text-slate-400 px-2 py-1 rounded"
+                    >C/C++</span
+                  >
+                  <span
+                    class="text-[10px] bg-slate-900/5 dark:bg-white/5 text-slate-600 dark:text-slate-400 px-2 py-1 rounded"
+                  >
+                    <span lang-content="vi">Thuật toán</span
+                    ><span lang-content="en">Algorithms</span>
+                  </span>
+                </div>
+              </div>
+            </div>
+            <div
+              class="absolute left-[15px] md:left-1/2 md:-translate-x-1/2 top-6 w-4 h-4 bg-primary rounded-full border-4 border-dark z-10"
+            ></div>
+            <div class="md:w-1/2 md:pl-12 hidden md:block"></div>
+          </div>
+
+          <!-- 2023 -->
+          <div
+            class="relative flex flex-col md:flex-row items-start mb-16 fade-in-up fade-in-up-delay-2"
+          >
+            <div class="md:w-1/2 md:pr-12 hidden md:block"></div>
+            <div
+              class="absolute left-[15px] md:left-1/2 md:-translate-x-1/2 top-6 w-4 h-4 bg-secondary rounded-full border-4 border-dark z-10"
+            ></div>
+            <div class="md:w-1/2 md:pl-12 pl-16">
+              <div
+                class="glass p-8 rounded-2xl border border-slate-900/5 dark:border-white/5 hover:border-secondary/30 transition-all"
+              >
+                <div class="flex items-center gap-2 mb-3">
+                  <i class="w-5 h-5 text-secondary" data-lucide="code-2"></i>
+                  <span class="text-sm font-bold text-secondary">2023</span>
+                </div>
+                <h3 class="text-xl font-bold text-slate-900 dark:text-white mb-3">
+                  <span lang-content="vi">Khám Phá Python & Dữ Liệu</span>
+                  <span lang-content="en">Discovering Python & Data</span>
+                </h3>
+                <p
+                  class="text-slate-600 dark:text-slate-400 text-sm leading-relaxed"
+                  lang-content="vi"
+                >
+                  Chuyển sang Python và yêu sự đơn giản của nó. Bắt đầu học phân
+                  tích dữ liệu với Pandas, NumPy. Tham gia khóa học Machine
+                  Learning đầu tiên trên Coursera.
+                </p>
+                <p
+                  class="text-slate-600 dark:text-slate-400 text-sm leading-relaxed"
+                  lang-content="en"
+                >
+                  Switched to Python and fell in love with its simplicity.
+                  Started learning data analysis with Pandas, NumPy. Enrolled in
+                  first ML course on Coursera.
+                </p>
+                <div class="flex flex-wrap gap-2 mt-4">
+                  <span
+                    class="text-[10px] bg-slate-900/5 dark:bg-white/5 text-slate-600 dark:text-slate-400 px-2 py-1 rounded"
+                    >Python</span
+                  >
+                  <span
+                    class="text-[10px] bg-slate-900/5 dark:bg-white/5 text-slate-600 dark:text-slate-400 px-2 py-1 rounded"
+                    >Pandas</span
+                  >
+                  <span
+                    class="text-[10px] bg-slate-900/5 dark:bg-white/5 text-slate-600 dark:text-slate-400 px-2 py-1 rounded"
+                    >Coursera</span
+                  >
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 2024 -->
+          <div
+            class="relative flex flex-col md:flex-row items-start mb-16 fade-in-up fade-in-up-delay-3"
+          >
+            <div class="md:w-1/2 md:pr-12 md:text-right pl-16 md:pl-0">
+              <div
+                class="glass p-8 rounded-2xl border border-slate-900/5 dark:border-white/5 hover:border-primary/30 transition-all"
+              >
+                <div class="flex items-center gap-2 mb-3 md:justify-end">
+                  <i
+                    class="w-5 h-5 text-primary"
+                    data-lucide="brain-circuit"
+                  ></i>
+                  <span class="text-sm font-bold text-primary">2024</span>
+                </div>
+                <h3 class="text-xl font-bold text-slate-900 dark:text-white mb-3">
+                  <span lang-content="vi">Đào Sâu Deep Learning</span>
+                  <span lang-content="en">Deep Diving into Deep Learning</span>
+                </h3>
+                <p
+                  class="text-slate-600 dark:text-slate-400 text-sm leading-relaxed"
+                  lang-content="vi"
+                >
+                  Huấn luyện mô hình CNN đầu tiên. Học PyTorch và TensorFlow
+                  song song. Bắt đầu thực hành Computer Vision với OpenCV.
+                </p>
+                <p
+                  class="text-slate-600 dark:text-slate-400 text-sm leading-relaxed"
+                  lang-content="en"
+                >
+                  Trained first CNN model. Learned PyTorch and TensorFlow in
+                  parallel. Started practicing Computer Vision with OpenCV.
+                </p>
+                <div class="flex flex-wrap gap-2 mt-4 md:justify-end">
+                  <span
+                    class="text-[10px] bg-slate-900/5 dark:bg-white/5 text-slate-600 dark:text-slate-400 px-2 py-1 rounded"
+                    >PyTorch</span
+                  >
+                  <span
+                    class="text-[10px] bg-slate-900/5 dark:bg-white/5 text-slate-600 dark:text-slate-400 px-2 py-1 rounded"
+                    >TensorFlow</span
+                  >
+                  <span
+                    class="text-[10px] bg-slate-900/5 dark:bg-white/5 text-slate-600 dark:text-slate-400 px-2 py-1 rounded"
+                    >CNN</span
+                  >
+                </div>
+              </div>
+            </div>
+            <div
+              class="absolute left-[15px] md:left-1/2 md:-translate-x-1/2 top-6 w-4 h-4 bg-primary rounded-full border-4 border-dark z-10"
+            ></div>
+            <div class="md:w-1/2 md:pl-12 hidden md:block"></div>
+          </div>
+
+          <!-- 2024  -->
+          <div
+            class="relative flex flex-col md:flex-row items-start mb-16 fade-in-up fade-in-up-delay-4"
+          >
+            <div class="md:w-1/2 md:pr-12 hidden md:block"></div>
+            <div
+              class="absolute left-[15px] md:left-1/2 md:-translate-x-1/2 top-6 w-4 h-4 bg-secondary rounded-full border-4 border-dark z-10 timeline-dot-active"
+            ></div>
+            <div class="md:w-1/2 md:pl-12 pl-16">
+              <div
+                class="glass p-8 rounded-2xl border border-secondary/20 hover:border-secondary/40 transition-all relative overflow-hidden"
+              >
+                <div
+                  class="absolute top-0 right-0 w-32 h-32 bg-secondary/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2"
+                ></div>
+                <div class="flex items-center gap-2 mb-3">
+                  <i class="w-5 h-5 text-secondary" data-lucide="sparkles"></i>
+                  <span class="text-sm font-bold text-secondary"
+                    >2024 - Present</span
+                  >
+                </div>
+                <h3 class="text-xl font-bold text-slate-900 dark:text-white mb-3">
+                  <span lang-content="vi">Kỷ Nguyên LLM & RAG</span>
+                  <span lang-content="en">The LLM & RAG Era</span>
+                </h3>
+                <p
+                  class="text-slate-600 dark:text-slate-400 text-sm leading-relaxed"
+                  lang-content="vi"
+                >
+                  ChatGPT thay đổi cục diện — tôi ngay lập tức nghiên cứu LLM.
+                  Học LangChain, xây dựng RAG pipeline, tích hợp OpenAI API.
+                  Triển khai AI Assistant chatbot trên website này.
+                </p>
+                <p
+                  class="text-slate-600 dark:text-slate-400 text-sm leading-relaxed"
+                  lang-content="en"
+                >
+                  ChatGPT changed the game — I immediately dove into LLM
+                  research. Learned LangChain, built RAG pipelines, integrated
+                  OpenAI API. Deployed AI Assistant on this website.
+                </p>
+                <div class="flex flex-wrap gap-2 mt-4">
+                  <span
+                    class="text-[10px] bg-secondary/10 text-secondary px-2 py-1 rounded font-bold"
+                    >LangChain</span
+                  >
+                  <span
+                    class="text-[10px] bg-secondary/10 text-secondary px-2 py-1 rounded font-bold"
+                    >OpenAI</span
+                  >
+                  <span
+                    class="text-[10px] bg-secondary/10 text-secondary px-2 py-1 rounded font-bold"
+                    >RAG</span
+                  >
+                  <span
+                    class="text-[10px] bg-secondary/10 text-secondary px-2 py-1 rounded font-bold"
+                    >FastAPI</span
+                  >
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Future -->
+          <div class="relative flex flex-col md:flex-row items-start mb-8">
+            <div class="md:w-1/2 md:pr-12 md:text-right pl-16 md:pl-0">
+              <div
+                class="glass p-8 rounded-2xl border border-dashed border-slate-900/10 dark:border-white/10 hover:border-primary/20 transition-all"
+              >
+                <div class="flex items-center gap-2 mb-3 md:justify-end">
+                  <i
+                    class="w-5 h-5 text-primary opacity-50"
+                    data-lucide="rocket"
+                  ></i>
+                  <span class="text-sm font-bold text-primary/50">
+                    <span lang-content="vi">Tương lai</span
+                    ><span lang-content="en">Future</span>
+                  </span>
+                </div>
+                <h3 class="text-xl font-bold text-slate-900 dark:text-white/60 mb-3">
+                  <span lang-content="vi">AI Engineer Chuyên Nghiệp</span>
+                  <span lang-content="en">Professional AI Engineer</span>
+                </h3>
+                <p
+                  class="text-slate-500 text-sm leading-relaxed"
+                  lang-content="vi"
+                >
+                  Mục tiêu: Trở thành AI Engineer chính thức, đóng góp vào các
+                  dự án AI quy mô lớn, chia sẻ kiến thức với cộng đồng.
+                </p>
+                <p
+                  class="text-slate-500 text-sm leading-relaxed"
+                  lang-content="en"
+                >
+                  Goal: Become a professional AI Engineer, contribute to
+                  large-scale AI projects, share knowledge with the community.
+                </p>
+                <div class="flex flex-wrap gap-2 mt-4 md:justify-end">
+                  <span
+                    class="text-[10px] bg-slate-900/5 dark:bg-white/5 text-slate-500 px-2 py-1 rounded"
+                    >MLOps</span
+                  >
+                  <span
+                    class="text-[10px] bg-slate-900/5 dark:bg-white/5 text-slate-500 px-2 py-1 rounded"
+                    >AI Research</span
+                  >
+                  <span
+                    class="text-[10px] bg-slate-900/5 dark:bg-white/5 text-slate-500 px-2 py-1 rounded"
+                    >Leadership</span
+                  >
+                </div>
+              </div>
+            </div>
+            <div
+              class="absolute left-[15px] md:left-1/2 md:-translate-x-1/2 top-6 w-4 h-4 bg-primary/30 rounded-full border-4 border-dark z-10"
+            ></div>
+            <div class="md:w-1/2 md:pl-12 hidden md:block"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Stats -->
+      <section class="max-w-4xl mx-auto mb-20">
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div class="glass p-6 rounded-2xl border border-slate-900/5 dark:border-white/5 text-center">
+            <div
+              class="text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary mb-2"
+            >
+              4+
+            </div>
+            <p
+              class="text-xs text-slate-500 uppercase tracking-wider font-bold"
+            >
+              <span lang-content="vi">Năm học tập</span
+              ><span lang-content="en">Years Learning</span>
+            </p>
+          </div>
+          <div class="glass p-6 rounded-2xl border border-slate-900/5 dark:border-white/5 text-center">
+            <div
+              class="text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-secondary to-primary mb-2"
+            >
+              3+
+            </div>
+            <p
+              class="text-xs text-slate-500 uppercase tracking-wider font-bold"
+            >
+              <span lang-content="vi">Dự án AI</span
+              ><span lang-content="en">AI Projects</span>
+            </p>
+          </div>
+          <div class="glass p-6 rounded-2xl border border-slate-900/5 dark:border-white/5 text-center">
+            <div
+              class="text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary mb-2"
+            >
+              8+
+            </div>
+            <p
+              class="text-xs text-slate-500 uppercase tracking-wider font-bold"
+            >
+              <span lang-content="vi">Công nghệ</span
+              ><span lang-content="en">Technologies</span>
+            </p>
+          </div>
+          <div class="glass p-6 rounded-2xl border border-slate-900/5 dark:border-white/5 text-center">
+            <div
+              class="text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-secondary to-primary mb-2"
+            >
+              ∞
+            </div>
+            <p
+              class="text-xs text-slate-500 uppercase tracking-wider font-bold"
+            >
+              <span lang-content="vi">Đam mê</span
+              ><span lang-content="en">Passion</span>
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- CTA -->
+      <section class="max-w-3xl mx-auto mb-32 text-center">
+        <div
+          class="glass p-10 rounded-3xl border border-slate-900/10 dark:border-white/10 relative overflow-hidden"
+        >
+          <div class="absolute top-0 right-0 p-6 opacity-10">
+            <i class="w-24 h-24" data-lucide="send"></i>
+          </div>
+          <h2 class="text-2xl font-bold text-slate-900 dark:text-white mb-4">
+            <span lang-content="vi">Sẵn sàng đồng hành cùng tôi?</span>
+            <span lang-content="en">Ready to join my journey?</span>
+          </h2>
+          <p class="text-slate-600 dark:text-slate-400 mb-8">
+            <span lang-content="vi"
+              >Tôi đang tìm kiếm cơ hội thực tập hoặc vị trí AI Engineer. Hãy
+              kết nối!</span
+            >
+            <span lang-content="en"
+              >I'm looking for internship or AI Engineer positions. Let's
+              connect!</span
+            >
+          </p>
+          <div class="flex flex-wrap justify-center gap-4">
+            <a
+              href="mailto:contact@buivietquoc.me"
+              class="inline-flex items-center gap-2 px-6 py-3 bg-primary text-white font-bold rounded-custom hover:bg-primary/90 transition-all shadow-xl shadow-primary/20"
+            >
+              <i class="w-5 h-5" data-lucide="mail"></i>
+              <span lang-content="vi">Liên hệ ngay</span>
+              <span lang-content="en">Contact Me</span>
+            </a>
+            <a
+              href="about.html"
+              class="inline-flex items-center gap-2 px-6 py-3 glass text-slate-900 dark:text-white font-bold rounded-custom hover:bg-slate-900/10 dark:hover:bg-white/10 transition-all"
+            >
+              <i class="w-5 h-5" data-lucide="user"></i>
+              <span lang-content="vi">Về tôi</span>
+              <span lang-content="en">About Me</span>
+            </a>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer
+      class="py-12 px-6 border-t border-slate-900/5 dark:border-white/5 text-center text-slate-600 text-sm"
+    >
+      <p>© 2024 Bùi Việt Quốc. Made with ❤️ & AI.</p>
+    </footer>
+
+    <!-- JS Files -->
+    <script src="assets/js/language.js"></script>
+    <script src="assets/js/main.js"></script>
+  </body>
+</html>

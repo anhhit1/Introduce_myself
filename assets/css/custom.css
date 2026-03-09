@@ -1,0 +1,102 @@
+/* ============================================
+   CUSTOM CSS — Portfolio Bùi Việt Quốc
+   ============================================ */
+
+/* --- Animations --- */
+@keyframes float {
+  0%   { transform: translateY(0px); }
+  50%  { transform: translateY(-10px); }
+  100% { transform: translateY(0px); }
+}
+.animate-float {
+  animation: float 6s ease-in-out infinite;
+}
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(30px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.fade-in-up { animation: fadeInUp 0.6s ease-out forwards; }
+.fade-in-up-delay-1 { animation-delay: 0.1s;  opacity: 0; }
+.fade-in-up-delay-2 { animation-delay: 0.2s;  opacity: 0; }
+.fade-in-up-delay-3 { animation-delay: 0.3s;  opacity: 0; }
+.fade-in-up-delay-4 { animation-delay: 0.4s;  opacity: 0; }
+
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 10px rgba(95, 98, 247, 0.8), 0 0 20px rgba(95, 98, 247, 0.4); }
+  50%      { box-shadow: 0 0 15px rgba(95, 98, 247, 1),   0 0 30px rgba(95, 98, 247, 0.6); }
+}
+.timeline-dot-active {
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+
+/* --- Glassmorphism --- */
+.glass {
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+}
+
+.dark .glass {
+  background: rgba(10, 10, 12, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: none;
+}
+
+/* --- Neon Effects --- */
+.neon-border {
+  box-shadow: 0 0 15px rgba(95, 98, 247, 0.4);
+}
+.neon-text {
+  text-shadow: 0 0 10px rgba(6, 182, 212, 0.5);
+}
+
+/* --- Multi-language Display Logic --- */
+[lang-content] { display: none; }
+html[lang="vi"] [lang-content="vi"]      { display: block; }
+html[lang="vi"] span[lang-content="vi"]  { display: inline; }
+html[lang="en"] [lang-content="en"]      { display: block; }
+html[lang="en"] span[lang-content="en"]  { display: inline; }
+
+/* --- Neural Background Canvas --- */
+canvas#neural-bg {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+  background: #f8fafc;
+  transition: background 0.3s ease;
+}
+
+.dark canvas#neural-bg {
+  background: #0a0a0c;
+}
+
+/* --- Skills Page: Progress Bars --- */
+.skill-bar {
+  height: 6px;
+  border-radius: 3px;
+  background: rgba(0, 0, 0, 0.05);
+  overflow: hidden;
+}
+
+.dark .skill-bar {
+  background: rgba(255, 255, 255, 0.05);
+}
+.skill-bar-fill {
+  height: 100%;
+  border-radius: 3px;
+  transition: width 1.5s ease-in-out;
+}
+
+/* --- Projects Page: Card Hover --- */
+.project-card:hover .project-icon {
+  transform: scale(1.15);
+}
+.project-icon {
+  transition: transform 0.4s ease;
+}
