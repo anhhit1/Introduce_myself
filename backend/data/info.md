@@ -12,7 +12,8 @@
 
 ## 2. Thông tin liên hệ
 - **Email**: buiquoc2k4@gmail.com
-- **LinkedIn / GitHub**: Hiện đang cập nhật trên hệ thống (Portfolio). (Có project Github: https://github.com/anhhit1/Driver-Behavior-Detection)
+- **LinkedIn**: www.linkedin.com/in/quoc-bui-3680413a3
+- **GitHub**: https://github.com/anhhit1
 
 ## 3. Câu chuyện và Định hướng
 - **Bắt đầu**: Hành trình với công nghệ bắt đầu từ năm hai đại học với dòng code Python đầu tiên. Quốc nhận ra sức mạnh và sự thú vị của thuật toán đứng sau AI và không ngừng tìm hiểu về AI kể từ đó.
@@ -58,6 +59,7 @@
 1. **AI Portfolio Assistant (Chatbot RAG hiện tại)**
    - **Mô tả**: Hệ thống trợ lý AI thông minh chạy ngay trên website cá nhân, sử dụng kiến trúc RAG để truy xuất thông tin hồ sơ của Quốc và trả lời câu hỏi thực tế.
    - **Công nghệ (Tech Stack)**: Python, LangChain, OpenAI API, FastAPI, ChromaDB.
+   - **Source Code**: https://github.com/anhhit1/Introduce_myself.git
 2. **Phát Hiện Hành Vi Lái Xe (Driver Behavior Detection)**
    - **Mô tả**: Dự án Deep Learning cho Computer Vision. Sử dụng mạng CNN phân tích ảnh/video theo thời gian thực để phát hiện các hành vi nguy hiểm của tài xế (nhắn tin, nghe điện thoại) nhằm nâng cao an toàn giao thông.
    - **Công nghệ**: PyTorch, GoogLeNet, InceptionV3, AlexNet.
@@ -65,3 +67,4 @@
 3. **Dự Báo Khách Hàng Rời Bỏ Ngân Hàng (Bank Customer Churn Prediction)**
    - **Mô tả**: Dự án Machine Learning dạng bài toán định loại (Classification). Nghiên cứu và tìm hiểu thuật toán cắt tỉa nhánh (pruning) và xử lý dữ liệu giúp dự báo người dùng rời bỏ ngân hàng.
    - **Công nghệ**: Scikit-learn, Pandas, NumPy, XGBoost (các mô hình sử dụng: Decision Tree, Random Forest, XGBoost).
+   - **Source Code**: https://github.com/anhhit1/Bank-Customer-Churn-Prediction.git

@@ -434,18 +434,18 @@
                   class="text-slate-600 dark:text-slate-400 text-sm leading-relaxed"
                   lang-content="vi"
                 >
-                  AI thay đổi cục diện — tôi ngay lập tức nghiên cứu LLM.
-                  Học LangChain, xây dựng RAG pipeline, tích hợp AI API.
-                  Triển khai AI Assistant chatbot trên website này.
+                  AI thay đổi cục diện — tôi ngay lập tức nghiên cứu LLM. Học
+                  LangChain, xây dựng RAG pipeline, tích hợp AI API. Triển khai
+                  AI Assistant chatbot trên website này.
                 </p>
                 <p
                   class="text-slate-600 dark:text-slate-400 text-sm leading-relaxed"
                   lang-content="en"
                 >
-                  AI changed the game — I immediately dove into LLM
-                  research. Learned LangChain, built RAG pipelines, integrated
-                  AI API. Deployed AI Assistant on this website.
-                </p>  
+                  AI changed the game — I immediately dove into LLM research.
+                  Learned LangChain, built RAG pipelines, integrated AI API.
+                  Deployed AI Assistant on this website.
+                </p>
                 <div class="flex flex-wrap gap-2 mt-4">
                   <span
                     class="text-[10px] bg-secondary/10 text-secondary px-2 py-1 rounded font-bold"
@@ -645,43 +645,83 @@
     </footer>
 
     <!-- AI Chatbot UI -->
-    <div class="fixed inset-0 z-[100] hidden items-center justify-center p-4 bg-slate-50 dark:bg-dark/80 backdrop-blur-sm" id="chat-modal">
-      <div class="bg-white dark:bg-[#121214] w-full max-w-lg rounded-2xl border border-slate-900/10 dark:border-white/10 shadow-2xl flex flex-col h-[600px] overflow-hidden">
+    <div
+      class="fixed inset-0 z-[100] hidden items-center justify-center p-4 bg-slate-50 dark:bg-dark/80 backdrop-blur-sm"
+      id="chat-modal"
+    >
+      <div
+        class="bg-white dark:bg-[#121214] w-full max-w-lg rounded-2xl border border-slate-900/10 dark:border-white/10 shadow-2xl flex flex-col h-[600px] overflow-hidden"
+      >
         <!-- Chat Header -->
-        <div class="p-4 border-b border-slate-900/10 dark:border-white/10 flex items-center justify-between bg-slate-100 dark:bg-white/5">
+        <div
+          class="p-4 border-b border-slate-900/10 dark:border-white/10 flex items-center justify-between bg-slate-100 dark:bg-white/5"
+        >
           <div class="flex items-center gap-3">
-            <div class="w-10 h-10 rounded-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center">
-              <i class="text-slate-900 dark:text-white w-6 h-6" data-lucide="bot"></i>
+            <div
+              class="w-10 h-10 rounded-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center"
+            >
+              <i
+                class="text-slate-900 dark:text-white w-6 h-6"
+                data-lucide="bot"
+              ></i>
             </div>
             <div>
-              <h4 class="font-bold text-slate-900 dark:text-white text-sm">Quốc's AI Assistant</h4>
+              <h4 class="font-bold text-slate-900 dark:text-white text-sm">
+                Quốc's AI Assistant
+              </h4>
               <div class="flex items-center gap-1">
                 <span class="w-1.5 h-1.5 rounded-full bg-green-500"></span>
-                <span class="text-[10px] text-slate-500 uppercase font-bold tracking-widest">Online</span>
+                <span
+                  class="text-[10px] text-slate-500 uppercase font-bold tracking-widest"
+                  >Online</span
+                >
               </div>
             </div>
           </div>
-          <button class="p-2 hover:bg-slate-900/5 dark:bg-white/5 rounded-full transition-colors text-slate-600 dark:text-slate-400" onclick="toggleChat()">
+          <button
+            class="p-2 hover:bg-slate-900/5 dark:bg-white/5 rounded-full transition-colors text-slate-600 dark:text-slate-400"
+            onclick="toggleChat()"
+          >
             <i class="w-5 h-5" data-lucide="x"></i>
           </button>
         </div>
         <!-- Chat Messages -->
         <div class="flex-1 p-4 overflow-y-auto space-y-4" id="chat-messages">
           <div class="flex gap-3">
-            <div class="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center flex-shrink-0">
+            <div
+              class="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center flex-shrink-0"
+            >
               <i class="text-primary w-4 h-4" data-lucide="bot"></i>
             </div>
-            <div class="bg-slate-100 dark:bg-white/5 p-3 rounded-2xl rounded-tl-none border border-slate-200 dark:border-white/5 text-sm max-w-[80%] text-slate-800 dark:text-slate-200">
-              <span lang-content="vi">Xin chào! Tôi là trợ lý AI của Quốc. Bạn muốn biết thêm về kỹ năng AI hay các dự án của anh ấy?</span>
-              <span lang-content="en">Hi! I'm Quoc's AI assistant. Would you like to know more about his AI skills or his projects?</span>
+            <div
+              class="bg-slate-100 dark:bg-white/5 p-3 rounded-2xl rounded-tl-none border border-slate-200 dark:border-white/5 text-sm max-w-[80%] text-slate-800 dark:text-slate-200"
+            >
+              <span lang-content="vi"
+                >Xin chào! Tôi là trợ lý AI của Quốc. Bạn muốn biết thêm về kỹ
+                năng AI hay các dự án của anh ấy?</span
+              >
+              <span lang-content="en"
+                >Hi! I'm Quoc's AI assistant. Would you like to know more about
+                his AI skills or his projects?</span
+              >
             </div>
           </div>
         </div>
         <!-- Chat Input -->
-        <div class="p-4 bg-slate-50 dark:bg-white/5 border-t border-slate-200 dark:border-white/10">
+        <div
+          class="p-4 bg-slate-50 dark:bg-white/5 border-t border-slate-200 dark:border-white/10"
+        >
           <div class="relative">
-            <input class="w-full bg-slate-100 dark:bg-dark border border-slate-200 dark:border-white/10 rounded-xl py-3 px-4 pr-12 text-sm focus:border-primary focus:ring-0 text-slate-900 dark:text-white" placeholder="Type a message..." type="text"/>
-            <button class="absolute right-2 top-1/2 -translate-y-1/2 p-2 text-primary hover:text-primary/80 transition-colors">
+            <input
+              id="chat-input"
+              class="w-full bg-slate-100 dark:bg-dark border border-slate-200 dark:border-white/10 rounded-xl py-3 px-4 pr-12 text-sm focus:border-primary focus:ring-0 text-slate-900 dark:text-white"
+              placeholder="Type a message..."
+              type="text"
+            />
+            <button
+              id="chat-send"
+              class="absolute right-2 top-1/2 -translate-y-1/2 p-2 text-primary hover:text-primary/80 transition-colors"
+            >
               <i class="w-5 h-5" data-lucide="send-horizonal"></i>
             </button>
           </div>
@@ -689,7 +729,10 @@
       </div>
     </div>
     <!-- Floating Chat Button -->
-    <button class="fixed bottom-8 right-8 w-16 h-16 bg-primary rounded-full shadow-[0_0_30px_rgba(95,98,247,0.6)] flex items-center justify-center text-white z-40 hover:scale-110 transition-transform animate-float" onclick="toggleChat()">
+    <button
+      class="fixed bottom-8 right-8 w-16 h-16 bg-primary rounded-full shadow-[0_0_30px_rgba(95,98,247,0.6)] flex items-center justify-center text-white z-40 hover:scale-110 transition-transform animate-float"
+      onclick="toggleChat()"
+    >
       <i class="w-8 h-8" data-lucide="sparkles"></i>
     </button>
 
