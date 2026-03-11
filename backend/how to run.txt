@@ -1,0 +1,77 @@
+Hướng dẫn khởi chạy dự án AI Portfolio Chatbot (RAG) từ đầu
+
+========================================
+PHẦN 1: CÀI ĐẶT VÀ CHẠY BACKEND (FASTAPI)
+========================================
+
+1. Mở Terminal (Command Prompt hoặc PowerShell).
+
+2. Di chuyển vào thư mục backend:
+   > cd "c:\Users\Acer\Thuc tap\Introduce_myself\backend"
+
+3. (Khuyến nghị) Tạo và kích hoạt môi trường ảo (Virtual Environment) để tránh xung đột thư viện:
+   - Tạo môi trường ảo: 
+     > python -m venv venv
+   - Kích hoạt môi trường ảo (trên Windows):
+     > venv\Scripts\activate
+
+4. Cài đặt các thư viện yêu cầu:
+   > pip install -r requirements.txt
+
+5. Cấu hình API Key:
+   - Đảm bảo bạn đã có file `.env` nằm trong thư mục `backend`.
+   - Nội dung file `.env` cần có dòng sau:
+     GEMINI_API_KEY="điền_api_key_của_bạn_vào_đây"
+
+6. Nạp dữ liệu vào Vector Database (Chỉ chạy lần đầu hoặc khi có thay đổi nội dung):
+   - Để AI có thể hiểu và trả lời các thông tin cá nhân của bạn, cần nạp file `data/info.md` vào ChromaDB.
+   - Chạy lệnh:
+     > python ingest.py
+   - Khi chạy xong, một thư mục `vectorstore` sẽ được tạo ra trong `backend`.
+
+7. Khởi chạy API Server:
+   - Chạy lệnh:
+     > python -m uvicorn main:app --reload
+   - Server sẽ hoạt động tại http://localhost:8000 (hoặc http://127.0.0.1:8000). Đừng tắt terminal này trong quá trình sử dụng web.
+
+
+========================================
+PHẦN 2: CHẠY FRONTEND (GIAO DIỆN WEB)
+========================================
+
+1. Mở File Explorer và điều hướng tới thư mục chứa dự án:
+   `c:\Users\Acer\Thuc tap\Introduce_myself`
+
+2. Bạn có thể chọn 1 trong 2 cách để mở web:
+   - Cách 1 (Đơn giản): Nhấn đúp chuột vào file `index.html` để mở ngay trên trình duyệt (như Google Chrome, Edge, Cốc Cốc, v.v.).
+   - Cách 2 (Sử dụng extension trên VSCode): Mở thư mục dự án bằng VSCode, cài đặt extension "Live Server", sau đó chuột phải vào file `index.html` và chọn "Open with Live Server".
+
+3. Trải nghiệm: Nhấp vào biểu tượng hạt lấp lánh (sparkles) ở góc dưới cùng bên phải màn hình để mở hộp thoại chat và trò chuyện với trợ lý AI.
+
+
+========================================
+LƯU Ý KHI SỬ DỤNG
+========================================
+- Nếu bạn cập nhật thông tin giới thiệu của mình trong file `backend/data/info.md`:
+  Bạn cần tắt server FastAPI đang chạy (nhấn `Ctrl + C`), sau đó có thể xóa thư mục `vectorstore`, và chạy lại lệnh `python ingest.py` để cập nhật cơ sở dữ liệu kiến thức mới, xong rồi mới bật lại server `uvicorn`.
+
+
+========================================
+PHẦN 3: HƯỚNG DẪN DÀNH CHO CÁC LẦN CHẠY TIẾP THEO
+========================================
+Nếu bạn đã hoàn thành cài đặt lần đầu và muốn mở lại dự án để sử dụng, bạn chỉ cần thực hiện các bước ngắn gọn sau:
+
+1. Mở Terminal (Command Prompt hoặc PowerShell).
+
+2. Di chuyển vào thư mục backend:
+   > cd "c:\Users\Acer\Thuc tap\Introduce_myself\backend"
+
+3. Kích hoạt môi trường ảo:
+   > venv\Scripts\activate
+
+4. Khởi chạy API Server:
+   > python -m uvicorn main:app --reload
+   (Server sẽ hoạt động tại http://localhost:8000. Cứ để terminal này chạy và không đóng lại).
+
+5. Mở Frontend: 
+   Mở file `index.html` (nằm ở thư mục gốc của dự án) bằng trình duyệt web hoặc Live Server tương tự như hướng dẫn ở Phần 2.

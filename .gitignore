@@ -1,0 +1,92 @@
+# ==========================================
+#  .gitignore — AI Portfolio (Bùi Việt Quốc)
+# ==========================================
+
+# ---- Biến môi trường & API keys (QUAN TRỌNG) ----
+.env
+.env.*
+*.env
+!.env.example 
+
+# ---- Python ----
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+*.egg
+*.egg-info/
+dist/
+build/
+eggs/
+parts/
+var/
+sdist/
+develop-eggs/
+.installed.cfg
+lib/
+lib64/
+wheels/
+*.whl
+
+# ---- Virtual environments ----
+.venv/
+venv/
+env/
+ENV/
+.env.bak
+
+# ---- Vector store / database ----
+# Dữ liệu Chroma có thể nặng, có thể build lại từ ingest.py
+vectorstore/
+*.db
+*.sqlite
+*.sqlite3
+
+# ---- Logs ----
+*.log
+error.log
+logs/
+
+# ---- IDE / Editor ----
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# ---- Node.js (nếu có) ----
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# ---- OS ----
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Desktop.ini
+
+# ---- Jupyter Notebooks ----
+.ipynb_checkpoints/
+*.ipynb
+
+# ---- Testing & Coverage ----
+.tox/
+.coverage
+.coverage.*
+htmlcov/
+.pytest_cache/
+*.pytest_cache
+
+# ---- Temp files ----
+tmp/
+temp/
+*.tmp
+*.bak
+*.backup

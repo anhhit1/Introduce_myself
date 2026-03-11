@@ -1,17 +1,15 @@
-/* ============================================
-   Chatbot Modal — Open / Close
-   ============================================ */
 function toggleChat() {
   var modal = document.getElementById("chat-modal");
   if (!modal) return;
 
-  modal.classList.toggle("hidden");
-  modal.classList.toggle("flex");
+  const isHidden = modal.classList.contains("scale-0");
 
-  if (!modal.classList.contains("hidden")) {
-    document.body.style.overflow = "hidden";
+  if (isHidden) {
+    modal.classList.remove("scale-0", "opacity-0", "pointer-events-none");
+    modal.classList.add("scale-100", "opacity-100");
   } else {
-    document.body.style.overflow = "";
+    modal.classList.add("scale-0", "opacity-0", "pointer-events-none");
+    modal.classList.remove("scale-100", "opacity-100");
   }
 }
 
@@ -30,6 +28,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Load chat history from sessionStorage
   let chatHistory = JSON.parse(sessionStorage.getItem("ai_chat_history")) || [];
+
+  if (chatHistory.length > 0) {
+    chatMessages.innerHTML = '';
+    chatHistory.forEach(msg => {
+      appendMessage(msg.sender, msg.text, false);
+    });
+  }
 
   // Function to append a message to the chat
   function appendMessage(sender, text, save = true) {
@@ -115,7 +120,7 @@ document.addEventListener("DOMContentLoaded", () => {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ message: message }),
+        body: JSON.stringify({ message: message, history: chatHistory.slice(0, -1) }),
       });
 
       const data = await response.json();
