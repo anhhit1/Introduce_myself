@@ -1,0 +1,979 @@
+<!doctype html>
+<html class="scroll-smooth dark" lang="vi">
+  <head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Bank Customer Churn Prediction • Bùi Việt Quốc</title>
+    <meta
+      name="description"
+      content="Chi tiết dự án Bank Customer Churn Prediction - Dự báo khách hàng rời bỏ ngân hàng bằng các mô hình Machine Learning."
+    />
+    <link href="https://fonts.googleapis.com" rel="preconnect" />
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script>
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              primary: "#5f62f7",
+              secondary: "#06b6d4",
+              dark: "#0a0a0c",
+            },
+            fontFamily: { sans: ["Inter", "sans-serif"] },
+          },
+        },
+      };
+    </script>
+    <link rel="stylesheet" href="assets/css/custom.css" />
+    <link rel="icon" type="image/svg+xml" href="./assets/icons/favicon.svg" />
+    <style>
+      .step-connector {
+        position: absolute;
+        left: 19px;
+        top: 40px;
+        bottom: -10px;
+        width: 2px;
+        background: linear-gradient(to bottom, #5f62f7, #06b6d4);
+        opacity: 0.3;
+      }
+      .tech-pill:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(95, 98, 247, 0.2);
+      }
+      .tech-pill {
+        transition: all 0.25s ease;
+      }
+      .feature-card:hover {
+        border-color: rgba(95, 98, 247, 0.4);
+        transform: translateY(-3px);
+      }
+      .feature-card {
+        transition: all 0.3s ease;
+      }
+      .code-block {
+        font-family: "Courier New", monospace;
+        font-size: 0.8rem;
+      }
+    </style>
+  </head>
+  <body
+    class="bg-slate-50 dark:bg-dark text-slate-800 dark:text-slate-200 font-sans selection:bg-primary/30"
+  >
+    <canvas id="neural-bg"></canvas>
+
+    <!-- Navigation -->
+    <nav class="fixed top-0 w-full z-50 px-6 py-4">
+      <div
+        class="max-w-7xl mx-auto flex items-center justify-between glass rounded-2xl px-6 py-3 border border-slate-900/10 dark:border-white/10"
+      >
+        <a href="index.html" class="flex items-center gap-2">
+          <div
+            class="w-8 h-8 bg-gradient-to-br from-primary to-secondary rounded-lg flex items-center justify-center font-bold text-white"
+          >
+            Q
+          </div>
+          <span
+            class="font-bold tracking-tight text-slate-900 dark:text-white hidden sm:block"
+            >Bùi Việt Quốc
+            <span class="text-secondary opacity-80">• AI Engineer</span></span
+          >
+        </a>
+        <div class="hidden md:flex items-center gap-8 text-sm font-medium">
+          <a class="hover:text-primary transition-colors" href="index.html"
+            ><span lang-content="vi">Trang chủ</span
+            ><span lang-content="en">Home</span></a
+          >
+          <a class="hover:text-primary transition-colors" href="about.html"
+            ><span lang-content="vi">Giới thiệu</span
+            ><span lang-content="en">About</span></a
+          >
+          <a class="hover:text-primary transition-colors" href="skills.html"
+            ><span lang-content="vi">Kỹ năng</span
+            ><span lang-content="en">Skills</span></a
+          >
+          <a class="text-primary font-bold" href="projects.html"
+            ><span lang-content="vi">Dự án</span
+            ><span lang-content="en">Projects</span></a
+          >
+          <a class="hover:text-primary transition-colors" href="journey.html"
+            ><span lang-content="vi">Hành trình</span
+            ><span lang-content="en">Journey</span></a
+          >
+        </div>
+        <div class="flex items-center gap-3">
+          <button
+            class="p-2 hover:bg-slate-900/5 dark:hover:bg-white/5 rounded-lg transition-colors border border-slate-900/5 dark:border-white/5 flex items-center justify-center"
+            id="theme-toggle"
+          >
+            <i class="w-4 h-4" data-lucide="moon"></i>
+          </button>
+          <button
+            class="p-2 hover:bg-slate-900/5 dark:bg-white/5 rounded-lg transition-colors border border-slate-900/5 dark:border-white/5 flex items-center gap-2 text-xs uppercase tracking-widest font-bold text-secondary"
+            id="lang-toggle"
+          >
+            <i class="w-4 h-4" data-lucide="languages"></i>
+            <span id="lang-label">EN</span>
+          </button>
+          <button
+            class="hidden sm:flex items-center gap-2 bg-primary hover:bg-primary/80 text-white px-4 py-2 rounded-lg text-sm font-semibold transition-all shadow-[0_0_20px_rgba(95,98,247,0.4)]"
+            onclick="toggleChat()"
+          >
+            <i class="w-4 h-4" data-lucide="sparkles"></i>
+            <span lang-content="vi">Chat với AI</span>
+            <span lang-content="en">Chat with AI</span>
+          </button>
+          <button class="md:hidden p-2" id="mobile-menu-btn">
+            <i class="w-6 h-6" data-lucide="menu"></i>
+          </button>
+        </div>
+      </div>
+    </nav>
+
+    <main class="relative pt-28 px-6 pb-24">
+      <!-- Breadcrumb -->
+      <div class="max-w-6xl mx-auto mb-8 fade-in-up">
+        <div class="flex items-center gap-2 text-sm text-slate-500">
+          <a
+            href="projects.html"
+            class="hover:text-primary transition-colors flex items-center gap-1"
+          >
+            <i class="w-4 h-4" data-lucide="arrow-left"></i>
+            <span lang-content="vi">Dự án</span>
+            <span lang-content="en">Projects</span>
+          </a>
+          <span>/</span>
+          <span class="text-primary font-semibold">
+            <span lang-content="vi">Dự Báo Khách Hàng Rời Bỏ Ngân Hàng</span>
+            <span lang-content="en">Bank Customer Churn Prediction</span>
+          </span>
+        </div>
+      </div>
+
+      <!-- Hero Section -->
+      <section class="max-w-6xl mx-auto mb-16 fade-in-up">
+        <div
+          class="glass rounded-3xl overflow-hidden border border-primary/20 shadow-[0_0_60px_rgba(95,98,247,0.15)]"
+        >
+          <div class="flex flex-col lg:flex-row">
+            <!-- Visual Side -->
+            <div
+              class="lg:w-5/12 bg-gradient-to-br from-primary/20 via-secondary/10 to-emerald-10 flex items-center justify-center p-16 min-h-[360px] relative overflow-hidden"
+            >
+              <div
+                class="absolute inset-0 bg-[radial-gradient(circle_at_20%_30%,rgba(95,98,247,0.3),transparent_65%)]"
+              ></div>
+              <div class="relative z-10 flex flex-col items-center gap-6">
+                <div
+                  class="w-28 h-28 rounded-3xl bg-primary/20 border border-primary/40 flex items-center justify-center"
+                >
+                  <i class="w-16 h-16 text-primary" data-lucide="users"></i>
+                </div>
+                <div class="flex flex-wrap justify-center gap-3">
+                  <span
+                    class="px-3 py-1.5 rounded-lg bg-white/10 border border-white/20 text-xs font-bold text-white flex items-center gap-1.5"
+                  >
+                    <span
+                      class="w-2 h-2 rounded-full bg-green-400 animate-pulse"
+                    ></span>
+                    Classification
+                  </span>
+                  <span
+                    class="px-3 py-1.5 rounded-lg bg-secondary/20 border border-secondary/40 text-xs font-bold text-secondary"
+                  >
+                    ML
+                  </span>
+                  <span
+                    class="px-3 py-1.5 rounded-lg bg-primary/20 border border-primary/40 text-xs font-bold text-primary"
+                  >
+                    XGBoost
+                  </span>
+                </div>
+                <p
+                  class="text-xs text-white/70 text-center max-w-xs leading-relaxed"
+                >
+                  <span lang-content="vi"
+                    >Dự báo khách hàng có khả năng rời bỏ dịch vụ, hỗ trợ ngân
+                    hàng tối ưu chiến lược giữ chân.</span
+                  >
+                  <span lang-content="en"
+                    >Predicts which customers are likely to churn to help the
+                    bank optimize retention strategies.</span
+                  >
+                </p>
+              </div>
+              <div
+                class="absolute -top-10 -right-6 w-20 h-20 rounded-full bg-secondary/30 blur-2xl"
+              ></div>
+              <div
+                class="absolute -bottom-12 -left-10 w-28 h-28 rounded-full bg-emerald-400/20 blur-3xl"
+              ></div>
+            </div>
+
+            <!-- Info Side -->
+            <div class="lg:w-7/12 p-10 lg:p-14 flex flex-col justify-center">
+              <div class="flex flex-wrap items-center gap-2 mb-5">
+                <span
+                  class="text-[10px] font-bold tracking-widest bg-secondary/20 text-secondary px-3 py-1 rounded-full uppercase"
+                  >Machine Learning</span
+                >
+                <span
+                  class="text-[10px] font-bold tracking-widest bg-primary/20 text-primary px-3 py-1 rounded-full uppercase"
+                  >Classification</span
+                >
+                <span
+                  class="text-[10px] font-bold tracking-widest bg-emerald-500/20 text-emerald-400 px-3 py-1 rounded-full uppercase"
+                  >Churn</span
+                >
+              </div>
+              <h1
+                class="text-4xl md:text-5xl font-extrabold text-slate-900 dark:text-white mb-5 leading-tight"
+              >
+                Bank Customer
+                <span
+                  class="text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary"
+                  >Churn Prediction</span
+                >
+              </h1>
+              <p
+                class="text-slate-600 dark:text-slate-400 mb-4 leading-relaxed text-lg"
+                lang-content="vi"
+              >
+                Dự án phân tích dữ liệu khách hàng của ngân hàng để
+                <strong class="text-primary"
+                  >dự đoán khả năng rời bỏ (churn)</strong
+                >, từ đó hỗ trợ đội ngũ kinh doanh nhận diện sớm nhóm khách hàng
+                rủi ro và xây dựng chiến lược giữ chân hiệu quả hơn.
+              </p>
+              <p
+                class="text-slate-600 dark:text-slate-400 mb-8 leading-relaxed text-lg"
+                lang-content="en"
+              >
+                A project that analyzes bank customer data to
+                <strong class="text-primary"
+                  >predict the likelihood of churn</strong
+                >, enabling business teams to proactively identify at‑risk
+                customers and design more effective retention strategies.
+              </p>
+              <div class="flex flex-wrap gap-3">
+                <a
+                  href="https://github.com/anhhit1/Bank-Customer-Churn-Prediction.git"
+                  target="_blank"
+                  class="inline-flex items-center gap-2 px-6 py-3 bg-secondary text-white font-bold rounded-xl hover:bg-secondary/90 transition-all shadow-[0_0_20px_rgba(6,182,212,0.4)] text-sm"
+                >
+                  <i class="w-4 h-4" data-lucide="github"></i>
+                  GitHub
+                </a>
+                <a
+                  href="projects.html"
+                  class="inline-flex items-center gap-2 px-6 py-3 glass text-slate-900 dark:text-white font-bold rounded-xl hover:bg-slate-900/10 dark:hover:bg-white/10 transition-all text-sm border border-slate-900/10 dark:border-white/10"
+                >
+                  <i class="w-4 h-4" data-lucide="arrow-left"></i>
+                  <span lang-content="vi">Quay lại Dự án</span>
+                  <span lang-content="en">Back to Projects</span>
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Stats Row -->
+      <section class="max-w-6xl mx-auto mb-16 fade-in-up fade-in-up-delay-1">
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div
+            class="glass rounded-2xl p-6 border border-slate-900/5 dark:border-white/5 text-center hover:border-primary/30 transition-all"
+          >
+            <div class="text-3xl font-extrabold text-primary mb-1">10k</div>
+            <div class="text-xs text-slate-500 uppercase tracking-wider">
+              <span lang-content="vi">Khách hàng</span>
+              <span lang-content="en">Customers</span>
+            </div>
+          </div>
+          <div
+            class="glass rounded-2xl p-6 border border-slate-900/5 dark:border-white/5 text-center hover:border-secondary/30 transition-all"
+          >
+            <div class="text-3xl font-extrabold text-secondary mb-1">3+</div>
+            <div class="text-xs text-slate-500 uppercase tracking-wider">
+              <span lang-content="vi">Mô hình ML</span>
+              <span lang-content="en">ML Models</span>
+            </div>
+          </div>
+          <div
+            class="glass rounded-2xl p-6 border border-slate-900/5 dark:border-white/5 text-center hover:border-emerald-400/30 transition-all"
+          >
+            <div class="text-3xl font-extrabold text-emerald-400 mb-1">
+              ~82%
+            </div>
+            <div class="text-xs text-slate-500 uppercase tracking-wider">
+              <span lang-content="vi">Accuracy test</span>
+              <span lang-content="en">Test accuracy</span>
+            </div>
+          </div>
+          <div
+            class="glass rounded-2xl p-6 border border-slate-900/5 dark:border-white/5 text-center hover:border-primary/30 transition-all"
+          >
+            <div class="text-3xl font-extrabold text-primary mb-1">Voting</div>
+            <div class="text-xs text-slate-500 uppercase tracking-wider">
+              <span lang-content="vi">Mô hình tốt nhất</span>
+              <span lang-content="en">Best model</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Data & Features -->
+      <section class="max-w-6xl mx-auto mb-16 fade-in-up fade-in-up-delay-1">
+        <div class="grid lg:grid-cols-2 gap-8">
+          <!-- Dataset -->
+          <div
+            class="glass rounded-2xl p-8 border border-slate-900/5 dark:border-white/5"
+          >
+            <div class="mb-6">
+              <div
+                class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-secondary/10 border border-secondary/20 text-secondary text-xs font-bold mb-3 uppercase tracking-widest"
+              >
+                <i class="w-3 h-3" data-lucide="table"></i>
+                <span lang-content="vi">Dữ liệu</span>
+                <span lang-content="en">Dataset</span>
+              </div>
+              <h2
+                class="text-2xl font-extrabold text-slate-900 dark:text-white"
+              >
+                <span lang-content="vi">Thông tin bộ dữ liệu</span>
+                <span lang-content="en">Dataset overview</span>
+              </h2>
+            </div>
+            <p class="text-xs text-slate-500 mb-4">
+              <span lang-content="vi"
+                >Dữ liệu gồm 10.000 khách hàng trong file
+                <code class="text-primary">Churn_Modelling.csv</code> với các
+                thuộc tính nhân khẩu học, tài chính và hành vi sử dụng dịch vụ,
+                cùng nhãn mục tiêu <code class="text-primary">Exited</code> (1:
+                rời bỏ, 0: ở lại).</span
+              >
+              <span lang-content="en"
+                >The dataset contains 10,000 customers in
+                <code class="text-primary">Churn_Modelling.csv</code>, including
+                demographic, financial, and behavioral features plus a target
+                label <code class="text-primary">Exited</code> (1: churn, 0:
+                stay).</span
+              >
+            </p>
+            <ul class="text-xs text-slate-500 space-y-1 list-disc pl-4">
+              <li>CreditScore, Age, Tenure, Balance</li>
+              <li>NumOfProducts, HasCrCard, IsActiveMember, EstimatedSalary</li>
+              <li>Geography (France, Spain, Germany), Gender (Male/Female)</li>
+              <li>Exited – churn label</li>
+            </ul>
+          </div>
+
+          <!-- Key Features -->
+          <div
+            class="glass rounded-2xl p-8 border border-slate-900/5 dark:border-white/5"
+          >
+            <div class="mb-6">
+              <div
+                class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-green-500/10 border border-green-500/20 text-green-400 text-xs font-bold mb-3 uppercase tracking-widest"
+              >
+                <i class="w-3 h-3" data-lucide="check-circle-2"></i>
+                <span lang-content="vi">Tính năng</span>
+                <span lang-content="en">Features</span>
+              </div>
+              <h2
+                class="text-2xl font-extrabold text-slate-900 dark:text-white"
+              >
+                <span lang-content="vi">Những điểm chính của dự án</span>
+                <span lang-content="en">Project highlights</span>
+              </h2>
+            </div>
+            <div class="space-y-4">
+              <div class="feature-card glass rounded-2xl p-4 border">
+                <p
+                  class="font-semibold text-slate-900 dark:text-white text-sm mb-1"
+                >
+                  <span lang-content="vi">Xử lý &amp; mã hóa dữ liệu</span>
+                  <span lang-content="en"
+                    >Data preprocessing &amp; encoding</span
+                  >
+                </p>
+                <p class="text-xs text-slate-500">
+                  <span lang-content="vi"
+                    >Sử dụng One-Hot Encoding cho
+                    <code class="text-primary">Geography</code>,
+                    <code class="text-primary">Gender</code>, chọn tập biến đầu
+                    vào có ý nghĩa cho mô hình.</span
+                  >
+                  <span lang-content="en"
+                    >Uses One‑Hot Encoding for
+                    <code class="text-primary">Geography</code> and
+                    <code class="text-primary">Gender</code>, selecting the most
+                    informative input features.</span
+                  >
+                </p>
+              </div>
+              <div class="feature-card glass rounded-2xl p-4 border">
+                <p
+                  class="font-semibold text-slate-900 dark:text-white text-sm mb-1"
+                >
+                  <span lang-content="vi">Cân bằng dữ liệu với SMOTE</span>
+                  <span lang-content="en">Handling imbalance with SMOTE</span>
+                </p>
+                <p class="text-xs text-slate-500">
+                  <span lang-content="vi"
+                    >Áp dụng SMOTE trên tập train để tăng số lượng mẫu lớp
+                    churn, giúp mô hình học tốt hơn nhóm thiểu số.</span
+                  >
+                  <span lang-content="en"
+                    >Applies SMOTE on the training set to oversample churn
+                    cases, improving performance on the minority class.</span
+                  >
+                </p>
+              </div>
+              <div class="feature-card glass rounded-2xl p-4 border">
+                <p
+                  class="font-semibold text-slate-900 dark:text-white text-sm mb-1"
+                >
+                  <span lang-content="vi"
+                    >Huấn luyện nhiều mô hình khác nhau</span
+                  >
+                  <span lang-content="en">Training multiple models</span>
+                </p>
+                <p class="text-xs text-slate-500">
+                  <span lang-content="vi"
+                    >So sánh Decision Tree, Random Forest, XGBoost và mô hình tổ
+                    hợp VotingClassifier.</span
+                  >
+                  <span lang-content="en"
+                    >Compares Decision Tree, Random Forest, XGBoost and an
+                    ensemble VotingClassifier.</span
+                  >
+                </p>
+              </div>
+              <div class="feature-card glass rounded-2xl p-4 border">
+                <p
+                  class="font-semibold text-slate-900 dark:text-white text-sm mb-1"
+                >
+                  <span lang-content="vi"
+                    >Đánh giá bằng nhiều chỉ số quan trọng</span
+                  >
+                  <span lang-content="en">Rich evaluation metrics</span>
+                </p>
+                <p class="text-xs text-slate-500">
+                  <span lang-content="vi"
+                    >Sử dụng Accuracy, F1, Recall, Precision cho cả hai lớp, tập
+                    trung tối ưu Recall/F1 của lớp churn.</span
+                  >
+                  <span lang-content="en"
+                    >Uses Accuracy, F1, Recall and Precision for both classes,
+                    focusing on improving churn class Recall/F1.</span
+                  >
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Pipeline & Code Snippet -->
+      <section class="max-w-6xl mx-auto mb-16">
+        <div class="grid lg:grid-cols-2 gap-8">
+          <!-- Pipeline -->
+          <div
+            class="glass rounded-2xl p-8 border border-slate-900/5 dark:border-white/5"
+          >
+            <div class="mb-6">
+              <div
+                class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs font-bold mb-3 uppercase tracking-widest"
+              >
+                <i class="w-3 h-3" data-lucide="git-branch"></i>
+                Pipeline
+              </div>
+              <h2
+                class="text-2xl font-extrabold text-slate-900 dark:text-white"
+              >
+                <span lang-content="vi">Quy trình xây dựng mô hình</span>
+                <span lang-content="en">Modeling pipeline</span>
+              </h2>
+            </div>
+            <div class="space-y-4">
+              <div class="relative flex gap-4">
+                <div class="flex flex-col items-center">
+                  <div
+                    class="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-white text-xs font-bold flex-shrink-0"
+                  >
+                    1
+                  </div>
+                  <div class="step-connector"></div>
+                </div>
+                <div class="pb-4">
+                  <p
+                    class="font-semibold text-slate-900 dark:text-white text-sm mb-1"
+                  >
+                    <span lang-content="vi">Khám phá &amp; xử lý dữ liệu</span>
+                    <span lang-content="en">EDA &amp; preprocessing</span>
+                  </p>
+                  <p class="text-xs text-slate-500">
+                    <span lang-content="vi"
+                      >Đọc dữ liệu, kiểm tra thiếu, phân phối biến, tương quan
+                      và chuẩn hóa các trường đầu vào.</span
+                    >
+                    <span lang-content="en"
+                      >Loads data, checks missing values, explores
+                      distributions, correlations and prepares input
+                      features.</span
+                    >
+                  </p>
+                </div>
+              </div>
+              <div class="relative flex gap-4">
+                <div class="flex flex-col items-center">
+                  <div
+                    class="w-8 h-8 rounded-full bg-secondary flex items-center justify-center text-white text-xs font-bold flex-shrink-0"
+                  >
+                    2
+                  </div>
+                  <div class="step-connector"></div>
+                </div>
+                <div class="pb-4">
+                  <p
+                    class="font-semibold text-slate-900 dark:text-white text-sm mb-1"
+                  >
+                    <span lang-content="vi">Chia train/test &amp; SMOTE</span>
+                    <span lang-content="en">Train/test split &amp; SMOTE</span>
+                  </p>
+                  <p class="text-xs text-slate-500">
+                    <span lang-content="vi"
+                      >Dùng
+                      <code class="text-primary">train_test_split</code> (test
+                      20%, stratify), sau đó áp dụng SMOTE trên tập train.</span
+                    >
+                    <span lang-content="en"
+                      >Uses
+                      <code class="text-primary">train_test_split</code> (20%
+                      test, stratified), then applies SMOTE on the training
+                      set.</span
+                    >
+                  </p>
+                </div>
+              </div>
+              <div class="relative flex gap-4">
+                <div class="flex flex-col items-center">
+                  <div
+                    class="w-8 h-8 rounded-full bg-emerald-500 flex items-center justify-center text-white text-xs font-bold flex-shrink-0"
+                  >
+                    3
+                  </div>
+                  <div class="step-connector"></div>
+                </div>
+                <div class="pb-4">
+                  <p
+                    class="font-semibold text-slate-900 dark:text-white text-sm mb-1"
+                  >
+                    <span lang-content="vi"
+                      >Huấn luyện mô hình &amp; Voting</span
+                    >
+                    <span lang-content="en">Train models &amp; Voting</span>
+                  </p>
+                  <p class="text-xs text-slate-500">
+                    <span lang-content="vi"
+                      >Train Decision Tree, Random Forest, XGBoost rồi kết hợp
+                      bằng
+                      <code class="text-primary">VotingClassifier</code>.</span
+                    >
+                    <span lang-content="en"
+                      >Trains Decision Tree, Random Forest, XGBoost and combines
+                      them using a
+                      <code class="text-primary">VotingClassifier</code>.</span
+                    >
+                  </p>
+                </div>
+              </div>
+              <div class="flex gap-4">
+                <div
+                  class="w-8 h-8 rounded-full bg-slate-900/80 flex items-center justify-center text-white text-xs font-bold flex-shrink-0"
+                >
+                  4
+                </div>
+                <div>
+                  <p
+                    class="font-semibold text-slate-900 dark:text-white text-sm mb-1"
+                  >
+                    <span lang-content="vi">Đánh giá &amp; so sánh</span>
+                    <span lang-content="en">Evaluate &amp; compare</span>
+                  </p>
+                  <p class="text-xs text-slate-500">
+                    <span lang-content="vi"
+                      >Dùng hàm
+                      <code class="text-primary">evaluate_model</code> để tính
+                      Train/Test Score, F1, Recall, Precision và tổng hợp kết
+                      quả trong
+                      <code class="text-primary">results_df</code>.</span
+                    >
+                    <span lang-content="en"
+                      >Uses <code class="text-primary">evaluate_model</code> to
+                      compute Train/Test Score, F1, Recall, Precision and
+                      aggregate results into
+                      <code class="text-primary">results_df</code>.</span
+                    >
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Code Snippet -->
+          <div
+            class="glass rounded-2xl overflow-hidden border border-slate-900/5 dark:border-white/10"
+          >
+            <div
+              class="flex items-center gap-2 px-5 py-3 bg-slate-100 dark:bg-white/5 border-b border-slate-200 dark:border-white/10"
+            >
+              <span class="w-3 h-3 rounded-full bg-red-400"></span>
+              <span class="w-3 h-3 rounded-full bg-yellow-400"></span>
+              <span class="w-3 h-3 rounded-full bg-green-400"></span>
+              <span class="ml-3 text-xs text-slate-500 font-mono"
+                >customer_churn.ipynb</span
+              >
+            </div>
+            <pre
+              class="code-block p-6 overflow-x-auto text-slate-800 dark:text-slate-300 leading-relaxed text-xs"
+            ><code><span class="text-purple-400">from</span> sklearn.ensemble <span class="text-purple-400">import</span> RandomForestClassifier, VotingClassifier
+<span class="text-purple-400">from</span> sklearn.tree <span class="text-purple-400">import</span> DecisionTreeClassifier
+<span class="text-purple-400">from</span> xgboost <span class="text-purple-400">import</span> XGBClassifier
+
+dt_model = DecisionTreeClassifier(ccp_alpha=<span class="text-orange-400">0.000949</span>, random_state=<span class="text-orange-400">0</span>)
+rf_model = RandomForestClassifier(
+    n_estimators=<span class="text-orange-400">51</span>,
+    max_depth=<span class="text-orange-400">11</span>,
+    min_samples_split=<span class="text-orange-400">4</span>,
+    min_samples_leaf=<span class="text-orange-400">1</span>,
+    random_state=<span class="text-orange-400">0</span>,
+)
+xgb_model = XGBClassifier(
+    min_child_weight=<span class="text-orange-400">0.8</span>,
+    reg_alpha=<span class="text-orange-400">0.4</span>,
+    reg_lambda=<span class="text-orange-400">1.1</span>,
+    random_state=<span class="text-orange-400">0</span>,
+)
+
+voting_clf = VotingClassifier(
+    estimators=[
+        (<span class="text-green-400">"dt"</span>, dt_model),
+        (<span class="text-green-400">"rf"</span>, rf_model),
+        (<span class="text-green-400">"xgb"</span>, xgb_model),
+    ],
+    voting=<span class="text-green-400">"hard"</span>,
+)</code></pre>
+          </div>
+        </div>
+      </section>
+
+      <!-- Results -->
+      <section class="max-w-6xl mx-auto mb-16">
+        <div class="mb-8">
+          <div
+            class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-bold mb-4 uppercase tracking-widest"
+          >
+            <i class="w-3 h-3" data-lucide="bar-chart-3"></i>
+            <span lang-content="vi">Kết quả</span>
+            <span lang-content="en">Results</span>
+          </div>
+          <h2 class="text-3xl font-extrabold text-slate-900 dark:text-white">
+            <span lang-content="vi">Hiệu năng các mô hình</span>
+            <span lang-content="en">Model performance</span>
+          </h2>
+        </div>
+        <div
+          class="glass rounded-2xl p-6 border border-slate-900/5 dark:border-white/5 overflow-x-auto"
+        >
+          <table class="min-w-full text-xs text-left">
+            <thead class="text-slate-500 uppercase tracking-wider">
+              <tr>
+                <th class="py-2 pr-4">Model</th>
+                <th class="py-2 pr-4 text-right">Train</th>
+                <th class="py-2 pr-4 text-right">Test</th>
+                <th class="py-2 pr-4 text-right">F1</th>
+                <th class="py-2 pr-4 text-right">Recall</th>
+                <th class="py-2 pr-4 text-right">Precision</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-200/60 dark:divide-white/5">
+              <tr>
+                <td class="py-2 pr-4">Decision Tree</td>
+                <td class="py-2 pr-4 text-right">0.8171</td>
+                <td class="py-2 pr-4 text-right">0.8185</td>
+                <td class="py-2 pr-4 text-right">0.5734</td>
+                <td class="py-2 pr-4 text-right">0.5995</td>
+                <td class="py-2 pr-4 text-right">0.5496</td>
+              </tr>
+              <tr>
+                <td class="py-2 pr-4">Random Forest</td>
+                <td class="py-2 pr-4 text-right">0.9041</td>
+                <td class="py-2 pr-4 text-right">0.8080</td>
+                <td class="py-2 pr-4 text-right">0.5724</td>
+                <td class="py-2 pr-4 text-right">0.6315</td>
+                <td class="py-2 pr-4 text-right">0.5234</td>
+              </tr>
+              <tr>
+                <td class="py-2 pr-4">XGBoost</td>
+                <td class="py-2 pr-4 text-right">0.9520</td>
+                <td class="py-2 pr-4 text-right">0.8130</td>
+                <td class="py-2 pr-4 text-right">0.5769</td>
+                <td class="py-2 pr-4 text-right">0.6265</td>
+                <td class="py-2 pr-4 text-right">0.5346</td>
+              </tr>
+              <tr class="bg-emerald-500/5">
+                <td class="py-2 pr-4 font-semibold">Voting Classifier</td>
+                <td class="py-2 pr-4 text-right font-semibold">0.9078</td>
+                <td class="py-2 pr-4 text-right font-semibold">0.8195</td>
+                <td class="py-2 pr-4 text-right font-semibold">0.5836</td>
+                <td class="py-2 pr-4 text-right font-semibold">0.6216</td>
+                <td class="py-2 pr-4 text-right font-semibold">0.5500</td>
+              </tr>
+            </tbody>
+          </table>
+          <p class="text-xs text-slate-500 mt-4">
+            <span lang-content="vi"
+              >VotingClassifier cho Test Score và F1 Score cao nhất, đồng thời
+              giữ Train Score ở mức vừa phải, giảm nguy cơ overfit so với
+              XGBoost đơn lẻ.</span
+            >
+            <span lang-content="en"
+              >The VotingClassifier achieves the best Test Score and F1 Score
+              while keeping Train Score moderate, reducing overfitting compared
+              to standalone XGBoost.</span
+            >
+          </p>
+        </div>
+      </section>
+
+      <!-- How to Run -->
+      <section class="max-w-6xl mx-auto mb-16">
+        <div class="mb-8">
+          <div
+            class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-900/10 dark:bg-white/10 border border-slate-900/10 dark:border-white/10 text-slate-700 dark:text-slate-300 text-xs font-bold mb-4 uppercase tracking-widest"
+          >
+            <i class="w-3 h-3" data-lucide="terminal-square"></i>
+            <span lang-content="vi">Cách chạy</span>
+            <span lang-content="en">How to run</span>
+          </div>
+          <h2 class="text-3xl font-extrabold text-slate-900 dark:text-white">
+            <span lang-content="vi">Thử nghiệm dự án</span>
+            <span lang-content="en">Experiment with the project</span>
+          </h2>
+        </div>
+        <div class="grid md:grid-cols-2 gap-6">
+          <div
+            class="glass rounded-2xl p-6 border border-slate-900/5 dark:border-white/5"
+          >
+            <h3
+              class="font-bold text-slate-900 dark:text-white mb-3 text-sm uppercase tracking-wider"
+            >
+              Setup
+            </h3>
+            <pre
+              class="code-block bg-slate-900/90 text-slate-100 rounded-xl p-4 text-[11px] overflow-x-auto"
+            ><code><span class="text-slate-500"># 1. Cài đặt thư viện</span>
+pip install pandas numpy matplotlib seaborn scikit-learn imbalanced-learn xgboost
+
+<span class="text-slate-500"># 2. Mở notebook</span>
+customer_churn.ipynb</code></pre>
+          </div>
+          <div
+            class="glass rounded-2xl p-6 border border-slate-900/5 dark:border-white/5"
+          >
+            <h3
+              class="font-bold text-slate-900 dark:text-white mb-3 text-sm uppercase tracking-wider"
+            >
+              <span lang-content="vi">Quy trình chạy</span>
+              <span lang-content="en">Execution flow</span>
+            </h3>
+            <ul class="text-xs text-slate-500 space-y-2 list-decimal pl-4">
+              <li>
+                <span lang-content="vi"
+                  >Mở
+                  <code class="text-primary">customer_churn.ipynb</code> trong
+                  Jupyter Notebook hoặc VS Code.</span
+                >
+                <span lang-content="en"
+                  >Open
+                  <code class="text-primary">customer_churn.ipynb</code> in
+                  Jupyter Notebook or VS Code.</span
+                >
+              </li>
+              <li>
+                <span lang-content="vi"
+                  >Chạy lần lượt các cell để tiền xử lý dữ liệu, huấn luyện và
+                  đánh giá mô hình.</span
+                >
+                <span lang-content="en"
+                  >Run cells sequentially to preprocess data, train and evaluate
+                  models.</span
+                >
+              </li>
+              <li>
+                <span lang-content="vi"
+                  >Quan sát bảng kết quả và classification report cho từng mô
+                  hình.</span
+                >
+                <span lang-content="en"
+                  >Inspect result tables and classification reports for each
+                  model.</span
+                >
+              </li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <!-- CTA -->
+      <section class="max-w-6xl mx-auto mb-8">
+        <div
+          class="glass rounded-3xl p-12 border border-primary/20 text-center bg-gradient-to-br from-primary/5 to-secondary/5 shadow-[0_0_40px_rgba(95,98,247,0.15)]"
+        >
+          <div
+            class="w-20 h-20 rounded-3xl bg-primary/20 border border-primary/30 flex items-center justify-center mx-auto mb-6"
+          >
+            <i class="w-10 h-10 text-primary" data-lucide="users"></i>
+          </div>
+          <h2
+            class="text-2xl font-extrabold text-slate-900 dark:text-white mb-3"
+          >
+            <span lang-content="vi">Khám phá thêm về dự án này</span>
+            <span lang-content="en">Explore this project further</span>
+          </h2>
+          <p class="text-slate-500 mb-8 max-w-xl mx-auto text-sm">
+            <span lang-content="vi"
+              >Notebook chi tiết, code huấn luyện và phân tích trực quan đều có
+              trên GitHub. Bạn có thể điều chỉnh tham số, thêm đặc trưng mới
+              hoặc thử các thuật toán khác.</span
+            >
+            <span lang-content="en"
+              >The full notebook, training code and visual analysis are
+              available on GitHub. You can tweak hyperparameters, add new
+              features or try alternative algorithms.</span
+            >
+          </p>
+          <div class="flex flex-wrap gap-4 justify-center">
+            <a
+              href="https://github.com/anhhit1/Bank-Customer-Churn-Prediction.git"
+              target="_blank"
+              class="inline-flex items-center gap-2 px-8 py-3.5 bg-primary text-white font-bold rounded-xl hover:bg-primary/90 transition-all shadow-[0_0_30px_rgba(95,98,247,0.5)] text-sm"
+            >
+              <i class="w-5 h-5" data-lucide="github"></i>
+              <span lang-content="vi">Xem mã nguồn</span>
+              <span lang-content="en">View Source Code</span>
+            </a>
+            <a
+              href="projects.html"
+              class="inline-flex items-center gap-2 px-8 py-3.5 glass text-slate-900 dark:text-white font-bold rounded-xl hover:bg-slate-900/10 dark:hover:bg-white/10 transition-all text-sm border border-slate-900/10 dark:border-white/10"
+            >
+              <i class="w-5 h-5" data-lucide="arrow-left"></i>
+              <span lang-content="vi">Dự án khác</span>
+              <span lang-content="en">Other Projects</span>
+            </a>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer
+      class="py-12 px-6 border-t border-slate-900/5 dark:border-white/5 text-center text-slate-600 text-sm"
+    >
+      <p>© 2025 Bùi Việt Quốc. Made with ❤️ &amp; AI.</p>
+    </footer>
+
+    <!-- AI Chatbot UI -->
+    <div
+      class="fixed bottom-28 right-8 z-[100] scale-0 opacity-0 pointer-events-none origin-bottom-right transition-all duration-300 flex flex-col h-[500px] w-[90vw] sm:w-[400px] bg-white dark:bg-[#121214] rounded-2xl border border-slate-900/10 dark:border-white/10 shadow-2xl overflow-hidden"
+      id="chat-modal"
+    >
+      <div
+        class="p-4 border-b border-slate-900/10 dark:border-white/10 flex items-center justify-between bg-slate-100 dark:bg-white/5"
+      >
+        <div class="flex items-center gap-3">
+          <div
+            class="w-10 h-10 rounded-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center"
+          >
+            <i class="text-white w-6 h-6" data-lucide="bot"></i>
+          </div>
+          <div>
+            <h4 class="font-bold text-slate-900 dark:text-white text-sm">
+              Quốc's AI Assistant
+            </h4>
+            <div class="flex items-center gap-1">
+              <span class="w-1.5 h-1.5 rounded-full bg-green-500"></span>
+              <span
+                class="text-[10px] text-slate-500 uppercase font-bold tracking-widest"
+                >Online</span
+              >
+            </div>
+          </div>
+        </div>
+        <button
+          class="p-2 hover:bg-slate-900/5 dark:hover:bg-white/5 rounded-full transition-colors text-slate-600 dark:text-slate-400"
+          onclick="toggleChat()"
+        >
+          <i class="w-5 h-5" data-lucide="x"></i>
+        </button>
+      </div>
+      <div class="flex-1 p-4 overflow-y-auto space-y-4" id="chat-messages">
+        <div class="flex gap-3">
+          <div
+            class="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center flex-shrink-0"
+          >
+            <i class="text-primary w-4 h-4" data-lucide="bot"></i>
+          </div>
+          <div
+            class="bg-slate-100 dark:bg-white/5 p-3 rounded-2xl rounded-tl-none border border-slate-200 dark:border-white/5 text-sm max-w-[80%] text-slate-800 dark:text-slate-200"
+          >
+            <span lang-content="vi"
+              >Xin chào! Tôi là trợ lý AI của Quốc. Bạn muốn tìm hiểu thêm về dự
+              án Bank Customer Churn Prediction hay các dự án AI khác?</span
+            >
+            <span lang-content="en"
+              >Hi! I'm Quoc's AI assistant. Would you like to know more about
+              the Bank Customer Churn Prediction project or other AI
+              projects?</span
+            >
+          </div>
+        </div>
+      </div>
+      <div
+        class="p-4 bg-slate-50 dark:bg-white/5 border-t border-slate-200 dark:border-white/10"
+      >
+        <div class="relative">
+          <input
+            id="chat-input"
+            class="w-full bg-slate-100 dark:bg-dark border border-slate-200 dark:border-white/10 rounded-xl py-3 px-4 pr-12 text-sm focus:border-primary focus:ring-1 focus:ring-primary text-slate-900 dark:text-white transition-all outline-none"
+            placeholder="Type a message..."
+            type="text"
+          />
+          <button
+            id="chat-send"
+            class="absolute right-2 top-1/2 -translate-y-1/2 p-2 text-primary hover:text-primary/80 transition-colors"
+          >
+            <i class="w-5 h-5" data-lucide="send-horizonal"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+    <button
+      class="fixed bottom-8 right-8 w-16 h-16 bg-primary rounded-full shadow-[0_0_30px_rgba(95,98,247,0.6)] flex items-center justify-center text-white z-40 hover:scale-110 transition-transform animate-float"
+      onclick="toggleChat()"
+    >
+      <i class="w-8 h-8" data-lucide="sparkles"></i>
+    </button>
+
+    <script src="assets/js/chatbot.js"></script>
+    <script src="assets/js/language.js"></script>
+    <script src="assets/js/main.js"></script>
+  </body>
+</html>

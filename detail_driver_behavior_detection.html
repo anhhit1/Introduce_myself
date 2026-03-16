@@ -1,0 +1,1633 @@
+<!doctype html>
+<html class="scroll-smooth dark" lang="vi">
+  <head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Driver Behavior Detection • Bùi Việt Quốc</title>
+    <meta
+      name="description"
+      content="Chi tiết dự án Driver Behavior Detection - Hệ thống phát hiện hành vi lái xe sử dụng Deep Learning và giao diện web Streamlit."
+    />
+    <link href="https://fonts.googleapis.com" rel="preconnect" />
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script>
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              primary: "#5f62f7",
+              secondary: "#06b6d4",
+              dark: "#0a0a0c",
+            },
+            fontFamily: { sans: ["Inter", "sans-serif"] },
+          },
+        },
+      };
+    </script>
+    <link rel="stylesheet" href="assets/css/custom.css" />
+    <link rel="icon" type="image/svg+xml" href="./assets/icons/favicon.svg" />
+    <style>
+      .step-connector {
+        position: absolute;
+        left: 19px;
+        top: 40px;
+        bottom: -10px;
+        width: 2px;
+        background: linear-gradient(to bottom, #5f62f7, #06b6d4);
+        opacity: 0.3;
+      }
+      .tech-pill:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(95, 98, 247, 0.2);
+      }
+      .tech-pill {
+        transition: all 0.25s ease;
+      }
+      .feature-card:hover {
+        border-color: rgba(95, 98, 247, 0.4);
+        transform: translateY(-3px);
+      }
+      .feature-card {
+        transition: all 0.3s ease;
+      }
+      .code-block {
+        font-family: "Courier New", monospace;
+        font-size: 0.8rem;
+      }
+    </style>
+  </head>
+  <body
+    class="bg-slate-50 dark:bg-dark text-slate-800 dark:text-slate-200 font-sans selection:bg-primary/30"
+  >
+    <canvas id="neural-bg"></canvas>
+
+    <!-- Navigation -->
+    <nav class="fixed top-0 w-full z-50 px-6 py-4">
+      <div
+        class="max-w-7xl mx-auto flex items-center justify-between glass rounded-2xl px-6 py-3 border border-slate-900/10 dark:border-white/10"
+      >
+        <a href="index.html" class="flex items-center gap-2">
+          <div
+            class="w-8 h-8 bg-gradient-to-br from-primary to-secondary rounded-lg flex items-center justify-center font-bold text-white"
+          >
+            Q
+          </div>
+          <span
+            class="font-bold tracking-tight text-slate-900 dark:text-white hidden sm:block"
+            >Bùi Việt Quốc
+            <span class="text-secondary opacity-80">• AI Engineer</span></span
+          >
+        </a>
+        <div class="hidden md:flex items-center gap-8 text-sm font-medium">
+          <a class="hover:text-primary transition-colors" href="index.html"
+            ><span lang-content="vi">Trang chủ</span
+            ><span lang-content="en">Home</span></a
+          >
+          <a class="hover:text-primary transition-colors" href="about.html"
+            ><span lang-content="vi">Giới thiệu</span
+            ><span lang-content="en">About</span></a
+          >
+          <a class="hover:text-primary transition-colors" href="skills.html"
+            ><span lang-content="vi">Kỹ năng</span
+            ><span lang-content="en">Skills</span></a
+          >
+          <a class="text-primary font-bold" href="projects.html"
+            ><span lang-content="vi">Dự án</span
+            ><span lang-content="en">Projects</span></a
+          >
+          <a class="hover:text-primary transition-colors" href="journey.html"
+            ><span lang-content="vi">Hành trình</span
+            ><span lang-content="en">Journey</span></a
+          >
+        </div>
+        <div class="flex items-center gap-3">
+          <button
+            class="p-2 hover:bg-slate-900/5 dark:hover:bg-white/5 rounded-lg transition-colors border border-slate-900/5 dark:border-white/5 flex items-center justify-center"
+            id="theme-toggle"
+          >
+            <i class="w-4 h-4" data-lucide="moon"></i>
+          </button>
+          <button
+            class="p-2 hover:bg-slate-900/5 dark:bg-white/5 rounded-lg transition-colors border border-slate-900/5 dark:border-white/5 flex items-center gap-2 text-xs uppercase tracking-widest font-bold text-secondary"
+            id="lang-toggle"
+          >
+            <i class="w-4 h-4" data-lucide="languages"></i>
+            <span id="lang-label">EN</span>
+          </button>
+          <button
+            class="hidden sm:flex items-center gap-2 bg-primary hover:bg-primary/80 text-white px-4 py-2 rounded-lg text-sm font-semibold transition-all shadow-[0_0_20px_rgba(95,98,247,0.4)]"
+            onclick="toggleChat()"
+          >
+            <i class="w-4 h-4" data-lucide="sparkles"></i>
+            <span lang-content="vi">Chat với AI</span>
+            <span lang-content="en">Chat with AI</span>
+          </button>
+          <button class="md:hidden p-2" id="mobile-menu-btn">
+            <i class="w-6 h-6" data-lucide="menu"></i>
+          </button>
+        </div>
+      </div>
+    </nav>
+
+    <main class="relative pt-28 px-6 pb-24">
+      <!-- Breadcrumb -->
+      <div class="max-w-6xl mx-auto mb-8 fade-in-up">
+        <div class="flex items-center gap-2 text-sm text-slate-500">
+          <a
+            href="projects.html"
+            class="hover:text-primary transition-colors flex items-center gap-1"
+          >
+            <i class="w-4 h-4" data-lucide="arrow-left"></i>
+            <span lang-content="vi">Dự án</span>
+            <span lang-content="en">Projects</span>
+          </a>
+          <span>/</span>
+          <span class="text-primary font-semibold">
+            <span lang-content="vi">Phát Hiện Hành Vi Lái Xe</span>
+            <span lang-content="en">Driver Behavior Detection</span>
+          </span>
+        </div>
+      </div>
+
+      <!-- Hero Section -->
+      <section class="max-w-6xl mx-auto mb-16 fade-in-up">
+        <div
+          class="glass rounded-3xl overflow-hidden border border-primary/20 shadow-[0_0_60px_rgba(95,98,247,0.15)]"
+        >
+          <div class="flex flex-col lg:flex-row">
+            <!-- Visual Side -->
+            <div
+              class="lg:w-5/12 bg-gradient-to-br from-secondary/20 via-primary/10 to-secondary/10 flex items-center justify-center p-16 min-h-[360px] relative overflow-hidden"
+            >
+              <div
+                class="absolute inset-0 bg-[radial-gradient(circle_at_20%_30%,rgba(6,182,212,0.25),transparent_65%)]"
+              ></div>
+              <div class="relative z-10 flex flex-col items-center gap-6">
+                <div
+                  class="w-28 h-28 rounded-3xl bg-secondary/20 border border-secondary/40 flex items-center justify-center"
+                >
+                  <i
+                    class="w-16 h-16 text-secondary"
+                    data-lucide="scan-eye"
+                  ></i>
+                </div>
+                <div class="flex flex-wrap justify-center gap-3">
+                  <span
+                    class="px-3 py-1.5 rounded-lg bg-white/10 border border-white/20 text-xs font-bold text-white flex items-center gap-1.5"
+                  >
+                    <span
+                      class="w-2 h-2 rounded-full bg-green-400 animate-pulse"
+                    ></span>
+                    Computer Vision
+                  </span>
+                  <span
+                    class="px-3 py-1.5 rounded-lg bg-primary/20 border border-primary/40 text-xs font-bold text-primary"
+                  >
+                    CNN
+                  </span>
+                  <span
+                    class="px-3 py-1.5 rounded-lg bg-secondary/20 border border-secondary/40 text-xs font-bold text-secondary"
+                  >
+                    Streamlit
+                  </span>
+                </div>
+                <p
+                  class="text-xs text-white/70 text-center max-w-xs leading-relaxed"
+                >
+                  <span lang-content="vi"
+                    >Phát hiện hành vi nguy hiểm như nhắn tin, nghe điện thoại
+                    khi lái xe từ ảnh hoặc video.</span
+                  >
+                  <span lang-content="en"
+                    >Detects dangerous behaviors like texting or calling while
+                    driving from images and videos.</span
+                  >
+                </p>
+              </div>
+              <div
+                class="absolute -top-10 -right-6 w-20 h-20 rounded-full bg-primary/20 blur-2xl"
+              ></div>
+              <div
+                class="absolute -bottom-12 -left-10 w-28 h-28 rounded-full bg-secondary/20 blur-3xl"
+              ></div>
+            </div>
+
+            <!-- Info Side -->
+            <div class="lg:w-7/12 p-10 lg:p-14 flex flex-col justify-center">
+              <div class="flex flex-wrap items-center gap-2 mb-5">
+                <span
+                  class="text-[10px] font-bold tracking-widest bg-secondary/20 text-secondary px-3 py-1 rounded-full uppercase"
+                  >Computer Vision</span
+                >
+                <span
+                  class="text-[10px] font-bold tracking-widest bg-primary/20 text-primary px-3 py-1 rounded-full uppercase"
+                  >CNN</span
+                >
+                <span
+                  class="text-[10px] font-bold tracking-widest bg-green-500/20 text-green-400 px-3 py-1 rounded-full uppercase"
+                  >Deep Learning</span
+                >
+                <span
+                  class="ml-auto text-[10px] font-bold bg-primary/10 text-primary px-3 py-1 rounded-full flex items-center gap-1.5 border border-primary/20"
+                >
+                  <span
+                    class="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse"
+                  ></span>
+                  Prototype
+                </span>
+              </div>
+              <h1
+                class="text-4xl md:text-5xl font-extrabold text-slate-900 dark:text-white mb-5 leading-tight"
+              >
+                Driver Behavior
+                <span
+                  class="text-transparent bg-clip-text bg-gradient-to-r from-secondary to-primary"
+                  >Detection</span
+                >
+              </h1>
+              <p
+                class="text-slate-600 dark:text-slate-400 mb-4 leading-relaxed text-lg"
+                lang-content="vi"
+              >
+                Ứng dụng học sâu sử dụng các mô hình CNN để
+                <strong class="text-primary"
+                  >phân tích và phân loại hành vi của tài xế</strong
+                >
+                thông qua ảnh hoặc video. Mục tiêu là hỗ trợ tăng cường an toàn
+                giao thông bằng cách phát hiện sớm các hành vi nguy hiểm như
+                nhắn tin, nói chuyện điện thoại khi đang lái xe.
+              </p>
+              <p
+                class="text-slate-600 dark:text-slate-400 mb-8 leading-relaxed text-lg"
+                lang-content="en"
+              >
+                A deep learning application using CNN models to
+                <strong class="text-primary"
+                  >analyze and classify driver behaviors</strong
+                >
+                from images or videos. The goal is to enhance traffic safety by
+                detecting risky actions such as texting or talking on the phone
+                while driving.
+              </p>
+              <div class="flex flex-wrap gap-3">
+                <a
+                  href="https://github.com/anhhit1/Driver-Behavior-Detection"
+                  target="_blank"
+                  class="inline-flex items-center gap-2 px-6 py-3 bg-secondary text-white font-bold rounded-xl hover:bg-secondary/90 transition-all shadow-[0_0_20px_rgba(6,182,212,0.4)] text-sm"
+                >
+                  <i class="w-4 h-4" data-lucide="github"></i>
+                  GitHub
+                </a>
+                <a
+                  href="projects.html"
+                  class="inline-flex items-center gap-2 px-6 py-3 glass text-slate-900 dark:text-white font-bold rounded-xl hover:bg-slate-900/10 dark:hover:bg-white/10 transition-all text-sm border border-slate-900/10 dark:border-white/10"
+                >
+                  <i class="w-4 h-4" data-lucide="arrow-left"></i>
+                  <span lang-content="vi">Quay lại Dự án</span>
+                  <span lang-content="en">Back to Projects</span>
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Stats Row -->
+      <section class="max-w-6xl mx-auto mb-16 fade-in-up fade-in-up-delay-1">
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div
+            class="glass rounded-2xl p-6 border border-slate-900/5 dark:border-white/5 text-center hover:border-secondary/30 transition-all"
+          >
+            <div class="text-3xl font-extrabold text-secondary mb-1">5</div>
+            <div class="text-xs text-slate-500 uppercase tracking-wider">
+              <span lang-content="vi">Lớp hành vi</span>
+              <span lang-content="en">Behavior Classes</span>
+            </div>
+          </div>
+          <div
+            class="glass rounded-2xl p-6 border border-slate-900/5 dark:border-white/5 text-center hover:border-primary/30 transition-all"
+          >
+            <div class="text-3xl font-extrabold text-primary mb-1">3</div>
+            <div class="text-xs text-slate-500 uppercase tracking-wider">
+              <span lang-content="vi">Mô hình CNN</span>
+              <span lang-content="en">CNN Models</span>
+            </div>
+          </div>
+          <div
+            class="glass rounded-2xl p-6 border border-slate-900/5 dark:border-white/5 text-center hover:border-green-400/30 transition-all"
+          >
+            <div class="text-3xl font-extrabold text-green-400 mb-1">Image</div>
+            <div class="text-xs text-slate-500 uppercase tracking-wider">
+              <span lang-content="vi">Ảnh &amp; Video</span>
+              <span lang-content="en">Image &amp; Video</span>
+            </div>
+          </div>
+          <div
+            class="glass rounded-2xl p-6 border border-slate-900/5 dark:border-white/5 text-center hover:border-primary/30 transition-all"
+          >
+            <div class="text-3xl font-extrabold text-primary mb-1">2024</div>
+            <div class="text-xs text-slate-500 uppercase tracking-wider">
+              <span lang-content="vi">Năm xây dựng</span>
+              <span lang-content="en">Built</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Behavior Classes & Features -->
+      <section class="max-w-6xl mx-auto mb-16 fade-in-up fade-in-up-delay-1">
+        <div class="grid lg:grid-cols-2 gap-8">
+          <!-- Classes -->
+          <div
+            class="glass rounded-2xl p-8 border border-slate-900/5 dark:border-white/5"
+          >
+            <div class="mb-6">
+              <div
+                class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-secondary/10 border border-secondary/20 text-secondary text-xs font-bold mb-3 uppercase tracking-widest"
+              >
+                <i class="w-3 h-3" data-lucide="type"></i>
+                <span lang-content="vi">Các Lớp Hành Vi</span>
+                <span lang-content="en">Behavior Classes</span>
+              </div>
+              <h2
+                class="text-2xl font-extrabold text-slate-900 dark:text-white"
+              >
+                <span lang-content="vi">Những hành vi được phân loại</span>
+                <span lang-content="en">Classified Behaviors</span>
+              </h2>
+            </div>
+            <div class="space-y-4">
+              <div
+                class="flex items-start gap-3 p-3 rounded-xl bg-slate-900/5 dark:bg_WHITE/5"
+              >
+                <span
+                  class="mt-1 w-6 h-6 rounded-full bg-primary/20 text-primary flex items-center justify-center text-xs font-bold"
+                  >01</span
+                >
+                <div>
+                  <p
+                    class="font-semibold text-slate-900 dark:text-white text-sm"
+                  >
+                    Other
+                  </p>
+                  <p class="text-xs text-slate-500">
+                    <span lang-content="vi"
+                      >Các hành vi khác không thuộc nhóm nguy hiểm hoặc an
+                      toàn.</span
+                    >
+                    <span lang-content="en"
+                      >Other behaviors that are not explicitly categorized as
+                      safe or risky.</span
+                    >
+                  </p>
+                </div>
+              </div>
+              <div
+                class="flex items-start gap-3 p-3 rounded-xl bg-slate-900/5 dark:bg_WHITE/5"
+              >
+                <span
+                  class="mt-1 w-6 h-6 rounded-full bg-green-500/20 text-green-500 flex items-center justify-center text-xs font-bold"
+                  >02</span
+                >
+                <div>
+                  <p
+                    class="font-semibold text-slate-900 dark:text-white text-sm"
+                  >
+                    Safe
+                  </p>
+                  <p class="text-xs text-slate-500">
+                    <span lang-content="vi"
+                      >Lái xe tập trung, hai tay trên vô lăng, không sử dụng
+                      điện thoại.</span
+                    >
+                    <span lang-content="en"
+                      >Driver is focused, hands on the wheel, not using a
+                      phone.</span
+                    >
+                  </p>
+                </div>
+              </div>
+              <div
+                class="flex items-start gap-3 p-3 rounded-xl bg-slate-900/5 dark:bg_WHITE/5"
+              >
+                <span
+                  class="mt-1 w-6 h-6 rounded-full bg-amber-400/20 text-amber-500 flex items-center justify-center text-xs font-bold"
+                  >03</span
+                >
+                <div>
+                  <p
+                    class="font-semibold text-slate-900 dark:text-white text-sm"
+                  >
+                    Talking
+                  </p>
+                  <p class="text-xs text-slate-500">
+                    <span lang-content="vi"
+                      >Tài xế đang nói chuyện điện thoại khi lái xe.</span
+                    >
+                    <span lang-content="en"
+                      >Driver is talking on the phone while driving.</span
+                    >
+                  </p>
+                </div>
+              </div>
+              <div
+                class="flex items-start gap-3 p-3 rounded-xl bg-slate-900/5 dark:bg_WHITE/5"
+              >
+                <span
+                  class="mt-1 w-6 h-6 rounded-full bg-red-500/20 text-red-500 flex items-center justify-center text-xs font-bold"
+                  >04</span
+                >
+                <div>
+                  <p
+                    class="font-semibold text-slate-900 dark:text-white text-sm"
+                  >
+                    Texting
+                  </p>
+                  <p class="text-xs text-slate-500">
+                    <span lang-content="vi"
+                      >Tài xế đang nhắn tin trên điện thoại, mất tập trung khỏi
+                      đường đi.</span
+                    >
+                    <span lang-content="en"
+                      >Driver is texting on the phone and losing focus from the
+                      road.</span
+                    >
+                  </p>
+                </div>
+              </div>
+              <div
+                class="flex items-start gap-3 p-3 rounded-xl bg-slate-900/5 dark:bg_WHITE/5"
+              >
+                <span
+                  class="mt-1 w-6 h-6 rounded-full bg-sky-500/20 text-sky-500 flex items-center justify-center text-xs font-bold"
+                  >05</span
+                >
+                <div>
+                  <p
+                    class="font-semibold text-slate-900 dark:text-white text-sm"
+                  >
+                    Turning
+                  </p>
+                  <p class="text-xs text-slate-500">
+                    <span lang-content="vi"
+                      >Tài xế đang rẽ hoặc quay đầu, thay đổi hướng lái.</span
+                    >
+                    <span lang-content="en"
+                      >Driver is turning or changing direction.</span
+                    >
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Features -->
+          <div
+            class="glass rounded-2xl p-8 border border-slate-900/5 dark:border-white/5"
+          >
+            <div class="mb-6">
+              <div
+                class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-green-500/10 border border-green-500/20 text-green-400 text-xs font-bold mb-3 uppercase tracking-widest"
+              >
+                <i class="w-3 h-3" data-lucide="check-circle-2"></i>
+                <span lang-content="vi">Tính năng</span>
+                <span lang-content="en">Features</span>
+              </div>
+              <h2
+                class="text-2xl font-extrabold text-slate-900 dark:text-white"
+              >
+                <span lang-content="vi">Những gì hệ thống có thể làm</span>
+                <span lang-content="en">What the system can do</span>
+              </h2>
+            </div>
+            <div class="space-y-4">
+              <div class="feature-card glass rounded-2xl p-4 border">
+                <div class="flex items-start gap-3">
+                  <div
+                    class="w-9 h-9 rounded-xl bg-primary/20 flex items-center justify-center"
+                  >
+                    <i class="w-4 h-4 text-primary" data-lucide="image"></i>
+                  </div>
+                  <div>
+                    <p
+                      class="font-semibold text-slate-900 dark:text-white text-sm mb-1"
+                    >
+                      <span lang-content="vi">Phân tích ảnh</span>
+                      <span lang-content="en">Image analysis</span>
+                    </p>
+                    <p class="text-xs text-slate-500">
+                      <span lang-content="vi"
+                        >Upload ảnh tài xế, hệ thống sẽ dự đoán lớp hành vi kèm
+                        theo xác suất chi tiết.</span
+                      >
+                      <span lang-content="en"
+                        >Upload a driver image and the system predicts the
+                        behavior class with confidence scores.</span
+                      >
+                    </p>
+                  </div>
+                </div>
+              </div>
+              <div class="feature-card glass rounded-2xl p-4 border">
+                <div class="flex items-start gap-3">
+                  <div
+                    class="w-9 h-9 rounded-xl bg-secondary/20 flex items-center justify-center"
+                  >
+                    <i class="w-4 h-4 text-secondary" data-lucide="film"></i>
+                  </div>
+                  <div>
+                    <p
+                      class="font-semibold text-slate-900 dark:text-white text-sm mb-1"
+                    >
+                      <span lang-content="vi">Phân tích video</span>
+                      <span lang-content="en">Video analysis</span>
+                    </p>
+                    <p class="text-xs text-slate-500">
+                      <span lang-content="vi"
+                        >Xử lý video theo từng khung hình, cho phép xem hành vi
+                        của tài xế theo thời gian.</span
+                      >
+                      <span lang-content="en"
+                        >Processes video frame by frame, allowing behavior
+                        inspection over time.</span
+                      >
+                    </p>
+                  </div>
+                </div>
+              </div>
+              <div class="feature-card glass rounded-2xl p-4 border">
+                <div class="flex items-start gap-3">
+                  <div
+                    class="w-9 h-9 rounded-xl bg-amber-400/20 flex items-center justify-center"
+                  >
+                    <i class="w-4 h-4 text-amber-400" data-lucide="brain"></i>
+                  </div>
+                  <div>
+                    <p
+                      class="font-semibold text-slate-900 dark:text-white text-sm mb-1"
+                    >
+                      <span lang-content="vi">So sánh đa mô hình</span>
+                      <span lang-content="en">Multi-model comparison</span>
+                    </p>
+                    <p class="text-xs text-slate-500">
+                      <span lang-content="vi"
+                        >Hỗ trợ 3 mô hình CNN khác nhau (AlexNet, InceptionV3,
+                        GoogLeNet) để so sánh độ chính xác và tốc độ.</span
+                      >
+                      <span lang-content="en"
+                        >Supports three CNN models (AlexNet, InceptionV3,
+                        GoogLeNet) to compare accuracy and speed.</span
+                      >
+                    </p>
+                  </div>
+                </div>
+              </div>
+              <div class="feature-card glass rounded-2xl p-4 border">
+                <div class="flex items-start gap-3">
+                  <div
+                    class="w-9 h-9 rounded-xl bg-emerald-400/20 flex items-center justify-center"
+                  >
+                    <i
+                      class="w-4 h-4 text-emerald-400"
+                      data-lucide="bar-chart-3"
+                    ></i>
+                  </div>
+                  <div>
+                    <p
+                      class="font-semibold text-slate-900 dark:text-white text-sm mb-1"
+                    >
+                      <span lang-content="vi">Biểu đồ xác suất</span>
+                      <span lang-content="en">Confidence visualization</span>
+                    </p>
+                    <p class="text-xs text-slate-500">
+                      <span lang-content="vi"
+                        >Hiển thị rõ ràng xác suất cho từng lớp, giúp hiểu mô
+                        hình tự tin như thế nào với dự đoán.</span
+                      >
+                      <span lang-content="en"
+                        >Shows probability for each class, helping understand
+                        model confidence.</span
+                      >
+                    </p>
+                  </div>
+                </div>
+              </div>
+              <div class="feature-card glass rounded-2xl p-4 border">
+                <div class="flex items-start gap-3">
+                  <div
+                    class="w-9 h-9 rounded-xl bg-primary/20 flex items-center justify-center"
+                  >
+                    <i
+                      class="w-4 h-4 text-primary"
+                      data-lucide="layout-template"
+                    ></i>
+                  </div>
+                  <div>
+                    <p
+                      class="font-semibold text-slate-900 dark:text-white text-sm mb-1"
+                    >
+                      <span lang-content="vi">Giao diện web Streamlit</span>
+                      <span lang-content="en">Streamlit web UI</span>
+                    </p>
+                    <p class="text-xs text-slate-500">
+                      <span lang-content="vi"
+                        >Giao diện thân thiện, dễ dùng, hỗ trợ hiển thị kết quả
+                        trực quan và tương tác nhanh.</span
+                      >
+                      <span lang-content="en"
+                        >User-friendly interface with clear visualization and
+                        quick interaction.</span
+                      >
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Tech Stack -->
+      <section class="max-w-6xl mx-auto mb-16">
+        <div class="mb-8">
+          <div
+            class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-secondary/10 border border-secondary/20 text-secondary text-xs font-bold mb-4 uppercase tracking-widest"
+          >
+            <i class="w-3 h-3" data-lucide="layers"></i>
+            Stack
+          </div>
+          <h2 class="text-3xl font-extrabold text-slate-900 dark:text-white">
+            <span lang-content="vi">Công Nghệ Sử Dụng</span>
+            <span lang-content="en">Tech Stack</span>
+          </h2>
+        </div>
+        <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div
+            class="tech-pill glass rounded-2xl p-6 border border-slate-900/5 dark:border-white/5 flex gap-4 items-start"
+          >
+            <div
+              class="w-12 h-12 rounded-xl bg-yellow-400/20 flex items-center justify-center flex-shrink-0"
+            >
+              <i class="w-6 h-6 text-yellow-400" data-lucide="code-2"></i>
+            </div>
+            <div>
+              <h3 class="font-bold text-slate-900 dark:text-white mb-1">
+                Python
+              </h3>
+              <p class="text-xs text-slate-500">
+                <span lang-content="vi"
+                  >Ngôn ngữ chính cho toàn bộ pipeline huấn luyện và suy luận mô
+                  hình.</span
+                >
+                <span lang-content="en"
+                  >Main language for training and inference pipelines.</span
+                >
+              </p>
+            </div>
+          </div>
+          <div
+            class="tech-pill glass rounded-2xl p-6 border border-slate-900/5 dark:border-white/5 flex gap-4 items-start"
+          >
+            <div
+              class="w-12 h-12 rounded-xl bg-purple-500/20 flex items-center justify-center flex-shrink-0"
+            >
+              <i
+                class="w-6 h-6 text-purple-400"
+                data-lucide="brain-circuit"
+              ></i>
+            </div>
+            <div>
+              <h3 class="font-bold text-slate-900 dark:text-white mb-1">
+                PyTorch / Keras
+              </h3>
+              <p class="text-xs text-slate-500">
+                <span lang-content="vi"
+                  >Xây dựng và load các mô hình CNN như AlexNet, InceptionV3,
+                  GoogLeNet.</span
+                >
+                <span lang-content="en"
+                  >Used to build and load CNN models like AlexNet, InceptionV3
+                  and GoogLeNet.</span
+                >
+              </p>
+            </div>
+          </div>
+          <div
+            class="tech-pill glass rounded-2xl p-6 border border-slate-900/5 dark:border-white/5 flex gap-4 items-start"
+          >
+            <div
+              class="w-12 h-12 rounded-xl bg-sky-500/20 flex items-center justify-center flex-shrink-0"
+            >
+              <i
+                class="w-6 h-6 text-sky-400"
+                data-lucide="layout-dashboard"
+              ></i>
+            </div>
+            <div>
+              <h3 class="font-bold text-slate-900 dark:text-white mb-1">
+                Streamlit
+              </h3>
+              <p class="text-xs text-slate-500">
+                <span lang-content="vi"
+                  >Tạo giao diện web trực quan cho việc upload, hiển thị và theo
+                  dõi kết quả dự đoán.</span
+                >
+                <span lang-content="en"
+                  >Builds an interactive web UI for upload and prediction
+                  visualization.</span
+                >
+              </p>
+            </div>
+          </div>
+          <div
+            class="tech-pill glass rounded-2xl p-6 border border-slate-900/5 dark:border-white/5 flex gap-4 items-start"
+          >
+            <div
+              class="w-12 h-12 rounded-xl bg-red-500/20 flex items-center justify-center flex-shrink-0"
+            >
+              <i class="w-6 h-6 text-red-400" data-lucide="camera"></i>
+            </div>
+            <div>
+              <h3 class="font-bold text-slate-900 dark:text-white mb-1">
+                OpenCV
+              </h3>
+              <p class="text-xs text-slate-500">
+                <span lang-content="vi"
+                  >Xử lý ảnh/video, đọc khung hình, chuyển đổi định dạng phục vụ
+                  mô hình.</span
+                >
+                <span lang-content="en"
+                  >Handles image/video processing and frame extraction.</span
+                >
+              </p>
+            </div>
+          </div>
+          <div
+            class="tech-pill glass rounded-2xl p-6 border border-slate-900/5 dark:border-white/5 flex gap-4 items-start"
+          >
+            <div
+              class="w-12 h-12 rounded-xl bg-emerald-500/20 flex items-center justify-center flex-shrink-0"
+            >
+              <i class="w-6 h-6 text-emerald-400" data-lucide="file-down"></i>
+            </div>
+            <div>
+              <h3 class="font-bold text-slate-900 dark:text-white mb-1">
+                gdown
+              </h3>
+              <p class="text-xs text-slate-500">
+                <span lang-content="vi"
+                  >Tự động tải các file mô hình từ Google Drive trong lần chạy
+                  đầu tiên.</span
+                >
+                <span lang-content="en"
+                  >Automatically downloads model files from Google Drive on the
+                  first run.</span
+                >
+              </p>
+            </div>
+          </div>
+          <div
+            class="tech-pill glass rounded-2xl p-6 border border-slate-900/5 dark:border-white/5 flex gap-4 items-start"
+          >
+            <div
+              class="w-12 h-12 rounded-xl bg-orange-500/20 flex items-center justify-center flex-shrink-0"
+            >
+              <i class="w-6 h-6 text-orange-400" data-lucide="cpu"></i>
+            </div>
+            <div>
+              <h3 class="font-bold text-slate-900 dark:text-white mb-1">
+                NumPy / Pandas
+              </h3>
+              <p class="text-xs text-slate-500">
+                <span lang-content="vi"
+                  >Xử lý dữ liệu, chuẩn hóa và thao tác trên ma trận/bảng.</span
+                >
+                <span lang-content="en"
+                  >Used for data manipulation, normalization and matrix
+                  operations.</span
+                >
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- How It Works (Code & Pipeline) -->
+      <section class="max-w-6xl mx-auto mb-16">
+        <div class="grid lg:grid-cols-2 gap-8">
+          <!-- Pipeline -->
+          <div
+            class="glass rounded-2xl p-8 border border-slate-900/5 dark:border-white/5"
+          >
+            <div class="mb-6">
+              <div
+                class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs font-bold mb-3 uppercase tracking-widest"
+              >
+                <i class="w-3 h-3" data-lucide="git-branch"></i>
+                Pipeline
+              </div>
+              <h2
+                class="text-2xl font-extrabold text-slate-900 dark:text-white"
+              >
+                <span lang-content="vi">Cách hệ thống hoạt động</span>
+                <span lang-content="en">How the system works</span>
+              </h2>
+            </div>
+            <div class="space-y-4">
+              <div class="relative flex gap-4">
+                <div class="flex flex-col items-center">
+                  <div
+                    class="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-white text-xs font-bold flex-shrink-0"
+                  >
+                    1
+                  </div>
+                  <div class="step-connector"></div>
+                </div>
+                <div class="pb-4">
+                  <p
+                    class="font-semibold text-slate-900 dark:text-white text-sm mb-1"
+                  >
+                    <span lang-content="vi">Tải mô hình an toàn</span>
+                    <span lang-content="en">Safe model loading</span>
+                  </p>
+                  <p class="text-xs text-slate-500">
+                    <span lang-content="vi"
+                      >Sử dụng
+                      <code class="text-primary">st.cache_resource</code> để tải
+                      và cache các mô hình, tự động tải file từ Google Drive nếu
+                      chưa tồn tại.</span
+                    >
+                    <span lang-content="en"
+                      >Uses
+                      <code class="text-primary">st.cache_resource</code> to
+                      load and cache models, automatically downloading from
+                      Google Drive if missing.</span
+                    >
+                  </p>
+                </div>
+              </div>
+              <div class="relative flex gap-4">
+                <div class="flex flex-col items-center">
+                  <div
+                    class="w-8 h-8 rounded-full bg-secondary flex items-center justify-center text-white text-xs font-bold flex-shrink-0"
+                  >
+                    2
+                  </div>
+                  <div class="step-connector"></div>
+                </div>
+                <div class="pb-4">
+                  <p
+                    class="font-semibold text-slate-900 dark:text-white text-sm mb-1"
+                  >
+                    <span lang-content="vi">Tiền xử lý ảnh</span>
+                    <span lang-content="en">Image preprocessing</span>
+                  </p>
+                  <p class="text-xs text-slate-500">
+                    <span lang-content="vi"
+                      >Chuẩn hóa ảnh về kích thước
+                      <code class="text-primary">224x224</code>, chuyển sang
+                      RGB, scale về khoảng \[0, 1\] và thêm batch
+                      dimension.</span
+                    >
+                    <span lang-content="en"
+                      >Normalizes image to
+                      <code class="text-primary">224x224</code>, converts to
+                      RGB, scales to \[0, 1\] and adds batch dimension.</span
+                    >
+                  </p>
+                </div>
+              </div>
+              <div class="relative flex gap-4">
+                <div class="flex flex-col items-center">
+                  <div
+                    class="w-8 h-8 rounded-full bg-emerald-500 flex items-center justify-center text-white text-xs font-bold flex-shrink-0"
+                  >
+                    3
+                  </div>
+                  <div class="step-connector"></div>
+                </div>
+                <div class="pb-4">
+                  <p
+                    class="font-semibold text-slate-900 dark:text-white text-sm mb-1"
+                  >
+                    <span lang-content="vi">Suy luận với mô hình</span>
+                    <span lang-content="en">Model inference</span>
+                  </p>
+                  <p class="text-xs text-slate-500">
+                    <span lang-content="vi"
+                      >Mô hình CNN nhận ảnh đã tiền xử lý và trả về vector xác
+                      suất cho từng lớp hành vi.</span
+                    >
+                    <span lang-content="en"
+                      >CNN model receives the preprocessed image and outputs
+                      probability scores for each behavior class.</span
+                    >
+                  </p>
+                </div>
+              </div>
+              <div class="flex gap-4">
+                <div
+                  class="w-8 h-8 rounded-full bg-slate-900/80 flex items-center justify-center text-white text-xs font-bold flex-shrink-0"
+                >
+                  4
+                </div>
+                <div>
+                  <p
+                    class="font-semibold text-slate-900 dark:text-white text-sm mb-1"
+                  >
+                    <span lang-content="vi">Hiển thị kết quả</span>
+                    <span lang-content="en">Display results</span>
+                  </p>
+                  <p class="text-xs text-slate-500">
+                    <span lang-content="vi"
+                      >Streamlit hiển thị nhãn dự đoán, biểu đồ xác suất và (với
+                      video) slider để xem từng khung hình.</span
+                    >
+                    <span lang-content="en"
+                      >Streamlit shows predicted label, probability chart and
+                      (for videos) a slider to inspect each frame.</span
+                    >
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Code Snippet -->
+          <div
+            class="glass rounded-2xl overflow-hidden border border-slate-900/5 dark:border-white/10"
+          >
+            <div
+              class="flex items-center gap-2 px-5 py-3 bg-slate-100 dark:bg_WHITE/5 border-b border-slate-200 dark:border_WHITE/10"
+            >
+              <span class="w-3 h-3 rounded-full bg-red-400"></span>
+              <span class="w-3 h-3 rounded-full bg-yellow-400"></span>
+              <span class="w-3 h-3 rounded-full bg-green-400"></span>
+              <span class="ml-3 text-xs text-slate-500 font-mono">app.py</span>
+            </div>
+            <pre
+              class="code-block p-6 overflow-x-auto text-slate-800 dark:text-slate-300 leading-relaxed text-xs"
+            ><code><span class="text-purple-400">import</span> streamlit <span class="text-purple-400">as</span> st
+<span class="text-purple-400">from</span> tensorflow.keras.models <span class="text-purple-400">import</span> load_model
+
+@st.cache_resource
+<span class="text-purple-400">def</span> load_models_safely():
+    models = {}
+    <span class="text-slate-500"># Khai báo thông tin model và ID Google Drive</span>
+    <span class="text-purple-400">for</span> name, info <span class="text-purple-400">in</span> model_info.items():
+        <span class="text-slate-500"># Tải model nếu chưa tồn tại</span>
+        <span class="text-purple-400">if not</span> os.path.exists(info[<span class="text-green-400">'path'</span>]):
+            st.info(f<span class="text-green-400">"Downloading {name} model..."</span>)
+            gdown.download(id=info[<span class="text-green-400">'id'</span>], output=info[<span class="text-green-400">'path'</span>], quiet=<span class="text-orange-400">False</span>)
+
+        <span class="text-purple-400">try</span>:
+            models[name] = load_model(info[<span class="text-green-400">'path'</span>])
+        <span class="text-purple-400">except</span> Exception <span class="text-purple-400">as</span> e:
+            st.error(f<span class="text-green-400">"Không thể load model {name}: {e}"</span>)
+
+    <span class="text-purple-400">return</span> models
+
+<span class="text-purple-400">def</span> preprocess_image(image, target_size=(<span class="text-orange-400">224</span>, <span class="text-orange-400">224</span>)):
+    <span class="text-slate-500"># Đảm bảo ảnh ở chế độ RGB</span>
+    <span class="text-purple-400">if</span> image.mode != <span class="text-green-400">"RGB"</span>:
+        image = image.convert(<span class="text-green-400">"RGB"</span>)
+
+    img = image.resize(target_size)
+    img = img_to_array(img)
+    img = np.expand_dims(img, axis=<span class="text-orange-400">0</span>)
+    img = img / <span class="text-orange-400">255.0</span>
+    <span class="text-purple-400">return</span> img</code></pre>
+          </div>
+        </div>
+      </section>
+
+      <!-- Installation & Usage -->
+      <section class="max-w-6xl mx-auto mb-16">
+        <div class="mb-8">
+          <div
+            class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-900/10 dark:bg_WHITE/10 border border-slate-900/10 dark:border_WHITE/10 text-slate-700 dark:text-slate-300 text-xs font-bold mb-4 uppercase tracking-widest"
+          >
+            <i class="w-3 h-3" data-lucide="terminal-square"></i>
+            <span lang-content="vi">Cài đặt &amp; Chạy</span>
+            <span lang-content="en">Setup &amp; Run</span>
+          </div>
+          <h2 class="text-3xl font-extrabold text-slate-900 dark:text-white">
+            <span lang-content="vi">Bắt đầu với dự án</span>
+            <span lang-content="en">Getting started</span>
+          </h2>
+        </div>
+        <div class="grid md:grid-cols-2 gap-6">
+          <!-- Requirements & Install -->
+          <div
+            class="glass rounded-2xl p-6 border border-slate-900/5 dark:border_WHITE/5"
+          >
+            <h3
+              class="font-bold text-slate-900 dark:text-white mb-3 text-sm uppercase tracking-wider"
+            >
+              <span lang-content="vi">Yêu cầu hệ thống</span>
+              <span lang-content="en">System requirements</span>
+            </h3>
+            <ul class="text-xs text-slate-500 space-y-1 mb-5 list-disc pl-4">
+              <li>Python 3.7+</li>
+              <li>
+                <span lang-content="vi"
+                  >RAM tối thiểu 4GB (khuyến nghị 8GB+)</span
+                >
+                <span lang-content="en"
+                  >At least 4GB RAM (8GB+ recommended)</span
+                >
+              </li>
+              <li>
+                <span lang-content="vi">GPU không bắt buộc nhưng nên có</span>
+                <span lang-content="en">GPU optional but recommended</span>
+              </li>
+              <li>
+                <span lang-content="vi"
+                  >~250MB cho model &amp; dependencies</span
+                >
+                <span lang-content="en"
+                  >~250MB for models and dependencies</span
+                >
+              </li>
+            </ul>
+            <h3
+              class="font-bold text-slate-900 dark:text-white mb-2 text-sm uppercase tracking-wider"
+            >
+              <span lang-content="vi">Cài đặt</span>
+              <span lang-content="en">Installation</span>
+            </h3>
+            <pre
+              class="code-block bg-slate-900/90 text-slate-100 rounded-xl p-4 text-[11px] overflow-x-auto"
+            ><code><span class="text-slate-500"># 1. Clone repository</span>
+git clone &lt;repository-url&gt;
+cd DRIVER-BEHAVIOR-main
+
+<span class="text-slate-500"># 2. Tạo virtual environment (khuyến nghị)</span>
+python -m venv venv
+<span class="text-slate-500"># Linux / Mac</span>
+source venv/bin/activate
+<span class="text-slate-500"># Windows</span>
+venv\Scripts\activate
+
+<span class="text-slate-500"># 3. Cài đặt dependencies</span>
+pip install -r requirements.txt</code></pre>
+          </div>
+
+          <!-- Run & Usage -->
+          <div
+            class="glass rounded-2xl p-6 border border-slate-900/5 dark:border_WHITE/5"
+          >
+            <h3
+              class="font-bold text-slate-900 dark:text-white mb-3 text-sm uppercase tracking-wider"
+            >
+              <span lang-content="vi">Chạy ứng dụng</span>
+              <span lang-content="en">Run the app</span>
+            </h3>
+            <pre
+              class="code-block bg-slate-900/90 text-slate-100 rounded-xl p-4 text-[11px] overflow-x-auto mb-4"
+            ><code>streamlit run app.py</code></pre>
+            <p class="text-xs text-slate-500 mb-4">
+              <span lang-content="vi"
+                >Ứng dụng sẽ tự động mở tại
+                <code class="text-primary">http://localhost:8501</code>. Lần
+                chạy đầu tiên có thể hơi lâu do phải tải các mô hình
+                (~250MB).</span
+              >
+              <span lang-content="en"
+                >The app will open at
+                <code class="text-primary">http://localhost:8501</code>. The
+                first run may take some time to download models (~250MB).</span
+              >
+            </p>
+            <h3
+              class="font-bold text-slate-900 dark:text-white mb-2 text-sm uppercase tracking-wider"
+            >
+              <span lang-content="vi">Cách sử dụng nhanh</span>
+              <span lang-content="en">Quick usage</span>
+            </h3>
+            <ul class="text-xs text-slate-500 space-y-2 list-decimal pl-4">
+              <li>
+                <span lang-content="vi"
+                  >Chọn tab <strong>Ảnh</strong> để upload ảnh JPG/PNG và chọn
+                  mô hình muốn sử dụng.</span
+                >
+                <span lang-content="en"
+                  >Select the <strong>Image</strong> tab to upload JPG/PNG and
+                  choose a model.</span
+                >
+              </li>
+              <li>
+                <span lang-content="vi"
+                  >Chọn tab <strong>Video</strong> để upload file MP4, dùng
+                  slider để xem dự đoán từng khung hình.</span
+                >
+                <span lang-content="en"
+                  >Select the <strong>Video</strong> tab to upload MP4 and use
+                  the slider to inspect each frame.</span
+                >
+              </li>
+              <li>
+                <span lang-content="vi"
+                  >Quan sát nhãn dự đoán và biểu đồ xác suất để đánh giá hành vi
+                  tài xế.</span
+                >
+                <span lang-content="en"
+                  >Check predicted labels and probability charts to evaluate
+                  driver behavior.</span
+                >
+              </li>
+              <li>
+                <span lang-content="vi"
+                  >Nhấn <code class="text-primary">Ctrl + C</code> trong
+                  terminal để dừng ứng dụng.</span
+                >
+                <span lang-content="en"
+                  >Press <code class="text-primary">Ctrl + C</code> in the
+                  terminal to stop the app.</span
+                >
+              </li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <!-- Model Comparison -->
+      <section class="max-w-6xl mx-auto mb-16">
+        <div class="mb-8">
+          <div
+            class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-400/10 border border-amber-400/30 text-amber-500 text-xs font-bold mb-4 uppercase tracking-widest"
+          >
+            <i class="w-3 h-3" data-lucide="grid-3x3"></i>
+            <span lang-content="vi">Mô hình CNN</span>
+            <span lang-content="en">CNN Models</span>
+          </div>
+          <h2 class="text-3xl font-extrabold text-slate-900 dark:text-white">
+            <span lang-content="vi">So sánh các mô hình</span>
+            <span lang-content="en">Model comparison</span>
+          </h2>
+        </div>
+        <div class="grid md:grid-cols-3 gap-4">
+          <div
+            class="glass rounded-2xl p-6 border border-slate-900/5 dark:border_WHITE/5"
+          >
+            <p
+              class="text-xs font-bold tracking-widest text-slate-500 uppercase mb-1"
+            >
+              AlexNet
+            </p>
+            <h3
+              class="font-extrabold text-slate-900 dark:text-white mb-2 text-lg"
+            >
+              <span lang-content="vi">Nhẹ &amp; Nhanh</span>
+              <span lang-content="en">Lightweight &amp; Fast</span>
+            </h3>
+            <p class="text-xs text-slate-500 mb-3">
+              <span lang-content="vi"
+                >Kiến trúc 8 tầng (5 convolution + 3 fully-connected), phù hợp
+                cho môi trường tài nguyên thấp.</span
+              >
+              <span lang-content="en"
+                >8-layer architecture (5 conv + 3 dense), suitable for
+                low-resource environments.</span
+              >
+            </p>
+            <ul class="text-xs text-slate-500 space-y-1 list-disc pl-4">
+              <li>
+                <span lang-content="vi">Tốc độ suy luận cao</span>
+                <span lang-content="en">High inference speed</span>
+              </li>
+              <li>
+                <span lang-content="vi">Độ chính xác vừa phải</span>
+                <span lang-content="en">Moderate accuracy</span>
+              </li>
+            </ul>
+          </div>
+          <div
+            class="glass rounded-2xl p-6 border border-slate-900/5 dark:border_WHITE/5"
+          >
+            <p
+              class="text-xs font-bold tracking-widest text-slate-500 uppercase mb-1"
+            >
+              InceptionV3
+            </p>
+            <h3
+              class="font-extrabold text-slate-900 dark:text-white mb-2 text-lg"
+            >
+              <span lang-content="vi">Độ chính xác cao</span>
+              <span lang-content="en">High Accuracy</span>
+            </h3>
+            <p class="text-xs text-slate-500 mb-3">
+              <span lang-content="vi"
+                >Sử dụng các Inception module để xử lý nhiều kích thước filter
+                song song, cân bằng hiệu quả tính toán.</span
+              >
+              <span lang-content="en"
+                >Uses Inception modules with parallel filters of different
+                sizes, balancing computation efficiency.</span
+              >
+            </p>
+            <ul class="text-xs text-slate-500 space-y-1 list-disc pl-4">
+              <li>
+                <span lang-content="vi">Độ chính xác cao hơn AlexNet</span>
+                <span lang-content="en">Higher accuracy than AlexNet</span>
+              </li>
+              <li>
+                <span lang-content="vi">Nặng hơn về tài nguyên</span>
+                <span lang-content="en">Heavier in resources</span>
+              </li>
+            </ul>
+          </div>
+          <div
+            class="glass rounded-2xl p-6 border border-emerald-400/30 bg-emerald-500/5"
+          >
+            <p
+              class="text-xs font-bold tracking-widest text-emerald-500 uppercase mb-1"
+            >
+              GoogLeNet (Inception V1)
+            </p>
+            <h3
+              class="font-extrabold text-slate-900 dark:text-white mb-2 text-lg"
+            >
+              <span lang-content="vi">Cân bằng tối ưu</span>
+              <span lang-content="en">Best Trade-off</span>
+            </h3>
+            <p class="text-xs text-slate-500 mb-3">
+              <span lang-content="vi"
+                >Đạt được cân bằng rất tốt giữa tốc độ, kích thước model và độ
+                chính xác, phù hợp cho ứng dụng thực tế.</span
+              >
+              <span lang-content="en"
+                >Provides an excellent balance between speed, model size and
+                accuracy for real-world applications.</span
+              >
+            </p>
+            <p class="text-xs font-semibold text-emerald-500">
+              <span lang-content="vi"
+                >Thường là lựa chọn tối ưu trong dự án này.</span
+              >
+              <span lang-content="en"
+                >Often the best choice in this project.</span
+              >
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Troubleshooting & Improvements -->
+      <section class="max-w-6xl mx-auto mb-16">
+        <div class="grid lg:grid-cols-2 gap-8">
+          <!-- Troubleshooting -->
+          <div
+            class="glass rounded-2xl p-8 border border-slate-900/5 dark:border_WHITE/5"
+          >
+            <div class="mb-4 flex items-center gap-2">
+              <div
+                class="w-9 h-9 rounded-xl bg-red-500/10 flex items-center justify-center"
+              >
+                <i class="w-4 h-4 text-red-400" data-lucide="alert-circle"></i>
+              </div>
+              <div>
+                <p
+                  class="text-xs font-bold tracking-widest text-slate-500 uppercase"
+                >
+                  Troubleshooting
+                </p>
+                <h3
+                  class="font-extrabold text-slate-900 dark:text-white text-lg"
+                >
+                  <span lang-content="vi">Lỗi thường gặp</span>
+                  <span lang-content="en">Common issues</span>
+                </h3>
+              </div>
+            </div>
+            <ul class="space-y-3 text-xs text-slate-500">
+              <li>
+                <p class="font-semibold text-slate-900 dark:text-white text-sm">
+                  ModuleNotFoundError
+                </p>
+                <p>
+                  <span lang-content="vi"
+                    >Đảm bảo đã cài đặt đầy đủ package với:</span
+                  >
+                  <span lang-content="en"
+                    >Make sure all packages are installed using:</span
+                  >
+                </p>
+                <pre
+                  class="code-block bg-slate-900/90 text-slate-100 rounded-lg p-2 mt-1"
+                ><code>pip install -r requirements.txt</code></pre>
+              </li>
+              <li>
+                <p class="font-semibold text-slate-900 dark:text-white text-sm">
+                  Lỗi tải mô hình / Model download error
+                </p>
+                <p>
+                  <span lang-content="vi"
+                    >Kiểm tra kết nối Internet và đảm bảo file trên Google Drive
+                    được chia sẻ công khai với ID chính xác.</span
+                  >
+                  <span lang-content="en"
+                    >Check your Internet connection and ensure Google Drive
+                    files are public and IDs are correct.</span
+                  >
+                </p>
+              </li>
+              <li>
+                <p class="font-semibold text-slate-900 dark:text_WHITE text-sm">
+                  Out of memory
+                </p>
+                <p>
+                  <span lang-content="vi"
+                    >Khởi động lại ứng dụng, giảm kích thước batch hoặc chạy
+                    trên môi trường có RAM cao hơn (&gt;=2GB).</span
+                  >
+                  <span lang-content="en"
+                    >Restart the app, reduce batch size or use an environment
+                    with higher RAM (&gt;=2GB).</span
+                  >
+                </p>
+              </li>
+            </ul>
+          </div>
+
+          <!-- Improvements -->
+          <div
+            class="glass rounded-2xl p-8 border border-slate-900/5 dark:border_WHITE/5"
+          >
+            <div class="mb-4 flex items-center gap-2">
+              <div
+                class="w-9 h-9 rounded-xl bg-primary/10 flex items-center justify-center"
+              >
+                <i class="w-4 h-4 text-primary" data-lucide="sparkles"></i>
+              </div>
+              <div>
+                <p
+                  class="text-xs font-bold tracking-widest text-slate-500 uppercase"
+                >
+                  Roadmap
+                </p>
+                <h3
+                  class="font-extrabold text-slate-900 dark:text-white text-lg"
+                >
+                  <span lang-content="vi">Định hướng phát triển</span>
+                  <span lang-content="en">Future improvements</span>
+                </h3>
+              </div>
+            </div>
+            <ul class="space-y-3 text-xs text-slate-500">
+              <li class="flex items-start gap-2">
+                <input
+                  checked
+                  disabled
+                  type="checkbox"
+                  class="mt-0.5 rounded border-slate-400 text-primary focus:ring-primary/40"
+                />
+                <div>
+                  <p
+                    class="font-semibold text-slate-900 dark:text-white text-sm"
+                  >
+                    <span lang-content="vi">Web app phân tích ảnh/video</span>
+                    <span lang-content="en"
+                      >Web app for image/video analysis</span
+                    >
+                  </p>
+                  <p>
+                    <span lang-content="vi"
+                      >Đã hoàn thành bản demo với Streamlit.</span
+                    >
+                    <span lang-content="en"
+                      >Completed demo using Streamlit.</span
+                    >
+                  </p>
+                </div>
+              </li>
+              <li class="flex items-start gap-2">
+                <input
+                  disabled
+                  type="checkbox"
+                  class="mt-0.5 rounded border-slate-400 text-primary focus:ring-primary/40"
+                />
+                <div>
+                  <p
+                    class="font-semibold text-slate-900 dark:text-white text-sm"
+                  >
+                    <span lang-content="vi">Hỗ trợ webcam real-time</span>
+                    <span lang-content="en">Real-time webcam support</span>
+                  </p>
+                  <p>
+                    <span lang-content="vi"
+                      >Cho phép phát hiện hành vi trực tiếp từ camera.</span
+                    >
+                    <span lang-content="en"
+                      >Detect behaviors directly from a webcam stream.</span
+                    >
+                  </p>
+                </div>
+              </li>
+              <li class="flex items-start gap-2">
+                <input
+                  disabled
+                  type="checkbox"
+                  class="mt-0.5 rounded border-slate-400 text-primary focus:ring-primary/40"
+                />
+                <div>
+                  <p
+                    class="font-semibold text-slate-900 dark:text-white text-sm"
+                  >
+                    <span lang-content="vi">API cho hệ thống khác</span>
+                    <span lang-content="en">API for other systems</span>
+                  </p>
+                  <p>
+                    <span lang-content="vi"
+                      >Triển khai REST API để tích hợp vào các ứng dụng giám sát
+                      hoặc xe thông minh.</span
+                    >
+                    <span lang-content="en"
+                      >Expose REST API for integration with monitoring systems
+                      or smart vehicles.</span
+                    >
+                  </p>
+                </div>
+              </li>
+              <li class="flex items-start gap-2">
+                <input
+                  disabled
+                  type="checkbox"
+                  class="mt-0.5 rounded border-slate-400 text-primary focus:ring-primary/40"
+                />
+                <div>
+                  <p
+                    class="font-semibold text-slate-900 dark:text-white text-sm"
+                  >
+                    <span lang-content="vi">Export kết quả phân tích</span>
+                    <span lang-content="en">Export analysis results</span>
+                  </p>
+                  <p>
+                    <span lang-content="vi"
+                      >Cho phép export ra CSV/JSON để phục vụ phân tích thống
+                      kê.</span
+                    >
+                    <span lang-content="en"
+                      >Export to CSV/JSON for downstream analytics.</span
+                    >
+                  </p>
+                </div>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <!-- CTA -->
+      <section class="max-w-6xl mx-auto mb-8">
+        <div
+          class="glass rounded-3xl p-12 border border-secondary/20 text-center bg-gradient-to-br from-secondary/5 to-primary/5 shadow-[0_0_40px_rgba(6,182,212,0.15)]"
+        >
+          <div
+            class="w-20 h-20 rounded-3xl bg-secondary/20 border border-secondary/30 flex items-center justify-center mx-auto mb-6"
+          >
+            <i
+              class="w-10 h-10 text-secondary"
+              data-lucide="steering-wheel"
+            ></i>
+          </div>
+          <h2
+            class="text-2xl font-extrabold text-slate-900 dark:text-white mb-3"
+          >
+            <span lang-content="vi">Khám phá thêm về dự án này</span>
+            <span lang-content="en">Explore this project further</span>
+          </h2>
+          <p class="text-slate-500 mb-8 max-w-xl mx-auto text-sm">
+            <span lang-content="vi"
+              >Mã nguồn chi tiết, notebook huấn luyện và tài liệu hướng dẫn đều
+              có trên GitHub. Bạn có thể fork, cải tiến mô hình hoặc tích hợp
+              vào hệ thống của riêng mình.</span
+            >
+            <span lang-content="en"
+              >Full source code, training notebooks and documentation are
+              available on GitHub. Feel free to fork, improve the models or
+              integrate them into your own system.</span
+            >
+          </p>
+          <div class="flex flex-wrap gap-4 justify-center">
+            <a
+              href="https://github.com/anhhit1/Driver-Behavior-Detection"
+              target="_blank"
+              class="inline-flex items-center gap-2 px-8 py-3.5 bg-secondary text-white font-bold rounded-xl hover:bg-secondary/90 transition-all shadow-[0_0_30px_rgba(6,182,212,0.5)] text-sm"
+            >
+              <i class="w-5 h-5" data-lucide="github"></i>
+              <span lang-content="vi">Xem mã nguồn</span>
+              <span lang-content="en">View Source Code</span>
+            </a>
+            <a
+              href="projects.html"
+              class="inline-flex items-center gap-2 px-8 py-3.5 glass text-slate-900 dark:text-white font-bold rounded-xl hover:bg-slate-900/10 dark:hover:bg_WHITE/10 transition-all text-sm border border-slate-900/10 dark:border_WHITE/10"
+            >
+              <i class="w-5 h-5" data-lucide="arrow-left"></i>
+              <span lang-content="vi">Dự án khác</span>
+              <span lang-content="en">Other Projects</span>
+            </a>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer
+      class="py-12 px-6 border-t border-slate-900/5 dark:border_WHITE/5 text-center text-slate-600 text-sm"
+    >
+      <p>© 2025 Bùi Việt Quốc. Made with ❤️ &amp; AI.</p>
+    </footer>
+
+    <!-- AI Chatbot UI -->
+    <div
+      class="fixed bottom-28 right-8 z-[100] scale-0 opacity-0 pointer-events-none origin-bottom-right transition-all duration-300 flex flex-col h-[500px] w-[90vw] sm:w-[400px] bg-white dark:bg-[#121214] rounded-2xl border border-slate-900/10 dark:border_WHITE/10 shadow-2xl overflow-hidden"
+      id="chat-modal"
+    >
+      <div
+        class="p-4 border-b border-slate-900/10 dark:border_WHITE/10 flex items-center justify-between bg-slate-100 dark:bg_WHITE/5"
+      >
+        <div class="flex items-center gap-3">
+          <div
+            class="w-10 h-10 rounded-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center"
+          >
+            <i class="text-white w-6 h-6" data-lucide="bot"></i>
+          </div>
+          <div>
+            <h4 class="font-bold text-slate-900 dark:text-white text-sm">
+              Quốc's AI Assistant
+            </h4>
+            <div class="flex items-center gap-1">
+              <span class="w-1.5 h-1.5 rounded-full bg-green-500"></span>
+              <span
+                class="text-[10px] text-slate-500 uppercase font-bold tracking-widest"
+                >Online</span
+              >
+            </div>
+          </div>
+        </div>
+        <button
+          class="p-2 hover:bg-slate-900/5 dark:hover:bg_WHITE/5 rounded-full transition-colors text-slate-600 dark:text-slate-400"
+          onclick="toggleChat()"
+        >
+          <i class="w-5 h-5" data-lucide="x"></i>
+        </button>
+      </div>
+      <div class="flex-1 p-4 overflow-y-auto space-y-4" id="chat-messages">
+        <div class="flex gap-3">
+          <div
+            class="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center flex-shrink-0"
+          >
+            <i class="text-primary w-4 h-4" data-lucide="bot"></i>
+          </div>
+          <div
+            class="bg-slate-100 dark:bg_WHITE/5 p-3 rounded-2xl rounded-tl-none border border-slate-200 dark:border_WHITE/5 text-sm max-w-[80%] text-slate-800 dark:text-slate-200"
+          >
+            <span lang-content="vi"
+              >Xin chào! Tôi là trợ lý AI của Quốc. Bạn muốn tìm hiểu thêm về dự
+              án Driver Behavior Detection hay các dự án AI khác?</span
+            >
+            <span lang-content="en"
+              >Hi! I'm Quoc's AI assistant. Would you like to know more about
+              the Driver Behavior Detection project or other AI projects?</span
+            >
+          </div>
+        </div>
+      </div>
+      <div
+        class="p-4 bg-slate-50 dark:bg_WHITE/5 border-t border-slate-200 dark:border_WHITE/10"
+      >
+        <div class="relative">
+          <input
+            id="chat-input"
+            class="w-full bg-slate-100 dark:bg-dark border border-slate-200 dark:border_WHITE/10 rounded-xl py-3 px-4 pr-12 text-sm focus:border-primary focus:ring-1 focus:ring-primary text-slate-900 dark:text-white transition-all outline-none"
+            placeholder="Type a message..."
+            type="text"
+          />
+          <button
+            id="chat-send"
+            class="absolute right-2 top-1/2 -translate-y-1/2 p-2 text-primary hover:text-primary/80 transition-colors"
+          >
+            <i class="w-5 h-5" data-lucide="send-horizonal"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+    <button
+      class="fixed bottom-8 right-8 w-16 h-16 bg-primary rounded-full shadow-[0_0_30px_rgba(95,98,247,0.6)] flex items-center justify-center text-white z-40 hover:scale-110 transition-transform animate-float"
+      onclick="toggleChat()"
+    >
+      <i class="w-8 h-8" data-lucide="sparkles"></i>
+    </button>
+
+    <script src="assets/js/chatbot.js"></script>
+    <script src="assets/js/language.js"></script>
+    <script src="assets/js/main.js"></script>
+  </body>
+</html>

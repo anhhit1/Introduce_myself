@@ -8,6 +8,10 @@
 *.env
 !.env.example 
 
+# ---- Hướng dẫn ----
+how code work.txt
+how to deploy.txt
+
 # ---- Python ----
 __pycache__/
 *.py[cod]
