@@ -115,7 +115,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     try {
       // POST request to backend
-      const response = await fetch("https://portfolio-website-fpv6.onrender.com", {
+      const response = await fetch("https://portfolio-website-fpv6.onrender.com/chat", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
